@@ -2728,11 +2728,16 @@ initGallery(document.getElementById('w-3zkb84sy'), { autoplay: false });
     }, 1000);
   }
 
+  // Xóa cache chặn cũ nếu có trên trình duyệt
+  try {
+    sessionStorage.removeItem('promo_popup_dismissed');
+  } catch(e) {}
+
+  let promoDismissedInThisView = false;
+  let hasOrderedSuccess = false;
+
   function showPromoPopup() {
-    // Không hiện nếu đã tắt trong phiên này (sessionStorage)
-    try {
-      if (sessionStorage.getItem('promo_popup_dismissed') === 'true') return;
-    } catch(e) {}
+    if (promoDismissedInThisView || hasOrderedSuccess) return;
 
     // Không hiện nếu đang mở popup đặt hàng thành công hoặc bảng size
     const popupSuccessEl = document.getElementById('w-__popup_default__');
@@ -2750,45 +2755,40 @@ initGallery(document.getElementById('w-3zkb84sy'), { autoplay: false });
   window.showPromoPopup = showPromoPopup;
   window.hidePromoPopup = hidePromoPopup;
 
-  function hidePromoPopup(markDismissed = true) {
+  function hidePromoPopup() {
     if (promoPopup) promoPopup.classList.add('d-none');
-    if (markDismissed) {
-      try {
-        sessionStorage.setItem('promo_popup_dismissed', 'true');
-      } catch(e) {}
-    }
+    promoDismissedInThisView = true;
   }
 
-  if (btnClosePromo) btnClosePromo.addEventListener('click', () => hidePromoPopup(true));
-  if (promoBackdrop) promoBackdrop.addEventListener('click', () => hidePromoPopup(true));
+  if (btnClosePromo) btnClosePromo.addEventListener('click', () => hidePromoPopup());
+  if (promoBackdrop) promoBackdrop.addEventListener('click', () => hidePromoPopup());
 
   if (btnPromoCta) {
     btnPromoCta.addEventListener('click', (e) => {
       e.preventDefault();
-      hidePromoPopup(true);
+      hidePromoPopup();
       triggerInitiateCheckout();
       scrollToForm();
     });
   }
 
-  // Tự động kích hoạt sau 18 giây
-  const promoTimer18s = setTimeout(() => {
+  // Tự động kích hoạt nhanh sau 3.5 giây
+  const promoTimerFast = setTimeout(() => {
     showPromoPopup();
-  }, 18000);
+  }, 3500);
 
-  // Tự động kích hoạt khi khách cuộn qua 50% trang
+  // Tự động kích hoạt khi khách vuốt màn hình (cuộn 10% hoặc qua 500px)
   let scrollPromoFired = false;
   window.addEventListener('scroll', function onScrollPromoCheck() {
-    if (scrollPromoFired) return;
+    if (scrollPromoFired || promoDismissedInThisView) return;
+    const y = window.scrollY || window.pageYOffset || 0;
     const totalScroll = document.documentElement.scrollHeight - window.innerHeight;
-    if (totalScroll > 0) {
-      const scrollPercent = (window.scrollY || window.pageYOffset) / totalScroll;
-      if (scrollPercent >= 0.5) {
-        scrollPromoFired = true;
-        clearTimeout(promoTimer18s);
-        showPromoPopup();
-        window.removeEventListener('scroll', onScrollPromoCheck);
-      }
+    const scrollPercent = totalScroll > 0 ? (y / totalScroll) : 0;
+    if (scrollPercent >= 0.10 || y >= 500) {
+      scrollPromoFired = true;
+      clearTimeout(promoTimerFast);
+      showPromoPopup();
+      window.removeEventListener('scroll', onScrollPromoCheck);
     }
   }, { passive: true });
 
