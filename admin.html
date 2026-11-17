@@ -1131,6 +1131,9 @@
       <button class="tab-btn" onclick="switchTab('orders')">
         🛒 Quản Lý Đơn Hàng <span class="tab-badge" id="tabOrderCount">0</span>
       </button>
+      <button class="tab-btn" onclick="switchTab('abandoned')" id="tabBtnAbandoned">
+        ⚠️ Đơn Rớt / Cần Cứu <span class="tab-badge" id="tabAbandonedCount" style="background:#ef4444; color:#fff;">0</span>
+      </button>
       <button class="tab-btn" onclick="switchTab('settings')">
         ⚙️ Cấu Hình Hệ Thống (Tele / Email / Pixel)
       </button>
@@ -1177,6 +1180,15 @@
           </div>
           <div class="stat-value" id="kpiTodayRevenue">0đ</div>
           <div class="stat-sub" id="kpiTodayOrders">0 đơn hôm nay</div>
+        </div>
+
+        <div class="stat-card abandoned" style="border-left: 4px solid #ef4444; cursor: pointer;" onclick="switchTab('abandoned')" title="Bấm để xem chi tiết danh sách đơn rớt">
+          <div class="stat-header">
+            <span class="stat-title" style="color: #ef4444;">ĐƠN RỚT CẦN CỨU</span>
+            <span class="stat-icon">⚠️</span>
+          </div>
+          <div class="stat-value" id="kpiAbandonedOrders" style="color: #ef4444;">0</div>
+          <div class="stat-sub" id="kpiAbandonedSub">Bấm để xem danh sách &amp; gọi ngay</div>
         </div>
       </div>
 
@@ -1261,6 +1273,63 @@
         </table>
       </div>
 
+    </main>
+
+    <!-- ================= TAB: ĐƠN RỚT / CẦN CỨU ================= -->
+    <main id="tab-abandoned" class="tab-pane">
+      <div class="card-box" style="margin-bottom: 20px; border-left: 4px solid #ef4444; background: linear-gradient(135deg, rgba(239, 68, 68, 0.08) 0%, var(--bg-card) 100%);">
+        <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
+          <div>
+            <h3 style="color: #ef4444; font-size: 16px; font-weight: 800; margin-bottom: 4px; display: flex; align-items: center; gap: 8px;">
+              <span>⚠️</span> DANH SÁCH KHÁCH RỚT ĐƠN / CHƯA HOÀN TẤT
+            </h3>
+            <p style="color: var(--text-dim); font-size: 12px; margin: 0;">
+              Hệ thống tự động bắt thông tin ngay khi khách điền SĐT trên form hoặc có ý định thoát trang. Gọi lại sớm trong 5 phút để tỷ lệ chốt lên tới 60%!
+            </p>
+          </div>
+          <div style="display: flex; gap: 8px;">
+            <button onclick="exportAbandonedToCSV()" class="btn-action" style="font-size: 12px; padding: 6px 12px;">📥 Xuất Excel Đơn Rớt</button>
+            <button onclick="clearAllAbandoned()" class="btn-action" style="font-size: 12px; padding: 6px 12px; border-color: rgba(239, 68, 68, 0.4); color: #ef4444;">🗑️ Làm Sạch Đơn Rớt</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Toolbar -->
+      <div class="crm-toolbar">
+        <div class="crm-search-box">
+          <span class="search-icon">🔍</span>
+          <input type="text" id="abandonedSearchInput" class="crm-search-input" placeholder="Tìm kiếm theo Tên khách, SĐT, Sản phẩm..." oninput="handleSearchAbandoned()">
+        </div>
+      </div>
+
+      <!-- Filter Chips -->
+      <div class="filter-chips">
+        <button class="chip-btn active" onclick="filterAbandonedByStatus('all', this)">Tất Cả (<span id="count-abandoned-all">0</span>)</button>
+        <button class="chip-btn" onclick="filterAbandonedByStatus('Chưa gọi', this)">🔴 Chưa gọi (<span id="count-abandoned-pending">0</span>)</button>
+        <button class="chip-btn" onclick="filterAbandonedByStatus('Đã cứu', this)">🟢 Đã cứu thành công (<span id="count-abandoned-rescued">0</span>)</button>
+        <button class="chip-btn" onclick="filterAbandonedByStatus('Không nghe', this)">🟡 Không nghe máy (<span id="count-abandoned-missed">0</span>)</button>
+        <button class="chip-btn" onclick="filterAbandonedByStatus('Hủy', this)">⚫ Bỏ qua / Hủy (<span id="count-abandoned-cancelled">0</span>)</button>
+      </div>
+
+      <!-- Abandoned Orders Table -->
+      <div class="table-container">
+        <table class="orders-table">
+          <thead>
+            <tr>
+              <th>Mã / Thời Gian Rớt</th>
+              <th>Khách Hàng &amp; SĐT</th>
+              <th>Địa Chỉ (Nếu có)</th>
+              <th>Sản Phẩm &amp; Size Quan Tâm</th>
+              <th>Giá Dự Kiến</th>
+              <th>Trạng Thái Cứu</th>
+              <th>Thao Tác Cứu Đơn</th>
+            </tr>
+          </thead>
+          <tbody id="abandonedTableBody">
+            <!-- Dynamically populated -->
+          </tbody>
+        </table>
+      </div>
     </main>
 
     <!-- ================= TAB 3: CẤU HÌNH HỆ THỐNG ================= -->
@@ -1566,6 +1635,7 @@
   <script>
     // 1. Quản lý trạng thái & dữ liệu
     const STORAGE_KEY_ORDERS = 'giaythethao_orders';
+    const STORAGE_KEY_ABANDONED = 'giaythethao_abandoned_orders';
     const STORAGE_KEY_CONFIG = 'giaythethao_config';
     const DEFAULT_PIN = 'admin123';
 
@@ -1573,21 +1643,27 @@
     let currentFilter = 'all';
     let searchQuery = '';
 
+    let abandonedData = [];
+    let currentAbandonedFilter = 'all';
+    let searchAbandonedQuery = '';
+
     // Khởi tạo ứng dụng
     document.addEventListener('DOMContentLoaded', () => {
       // Bật đồng hồ thời gian thực
       startClock();
       
-      // Load config & orders
+      // Load config, orders & abandoned leads
       loadConfig();
       loadOrders();
+      loadAbandonedOrders();
       loadCodeGsTemplate();
 
       // Kiểm tra session đăng nhập hoặc hash preview
       const hash = window.location.hash || '';
       if (sessionStorage.getItem('admin_logged_in') === 'true' || hash.includes('preview')) {
         showDashboard();
-        if (hash.includes('orders')) switchTab('orders');
+        if (hash.includes('abandoned')) switchTab('abandoned');
+        else if (hash.includes('orders')) switchTab('orders');
         else if (hash.includes('config') || hash.includes('settings')) switchTab('settings');
         else if (hash.includes('guide')) switchTab('guide');
         else switchTab('dashboard');
@@ -1771,6 +1847,8 @@
       renderOrdersTable();
       updateDashboardKPIs();
       updateOrderCounts();
+      renderAbandonedTable();
+      updateAbandonedCounts();
     }
 
     // Update Counts
@@ -2080,6 +2158,260 @@
       showToast('✓ Đã tải file Excel / CSV đơn hàng thành công!');
     }
 
+    // ==========================================
+    // QUẢN LÝ ĐƠN RỚT / CẦN CỨU (ABANDONED LEADS)
+    // ==========================================
+    function loadAbandonedOrders() {
+      const raw = localStorage.getItem(STORAGE_KEY_ABANDONED);
+      if (raw) {
+        try {
+          abandonedData = JSON.parse(raw);
+        } catch(e) {
+          abandonedData = [];
+        }
+      } else {
+        // Mẫu đơn rớt demo nếu chưa có đơn nào
+        abandonedData = [
+          {
+            order_id: 'ROT-261117-RESC1',
+            order_time: '17/11/2026 16:40:12',
+            full_name: 'Nguyễn Văn Minh',
+            phone_number: '0978654321',
+            province: 'Hà Nội',
+            district: 'Nam Từ Liêm',
+            address: 'Tòa Landmark 72',
+            product: 'Giày Safety Cổ Thấp',
+            size: '41',
+            quantity: 2,
+            price: '329.000đ',
+            total_amount: '599.000đ',
+            status: 'Chưa gọi',
+            note: 'Khách điền SĐT rồi thoát trang (Cần gọi lại gấp!)'
+          }
+        ];
+        localStorage.setItem(STORAGE_KEY_ABANDONED, JSON.stringify(abandonedData));
+      }
+    }
+
+    function saveAbandonedOrders() {
+      localStorage.setItem(STORAGE_KEY_ABANDONED, JSON.stringify(abandonedData));
+      renderAbandonedTable();
+      updateAbandonedCounts();
+      updateDashboardKPIs();
+    }
+
+    function updateAbandonedCounts() {
+      const total = abandonedData.length;
+      const countEl = document.getElementById('tabAbandonedCount');
+      if (countEl) countEl.textContent = total;
+
+      let pending = 0, rescued = 0, missed = 0, cancelled = 0;
+      abandonedData.forEach(o => {
+        if (o.status === 'Chưa gọi') pending++;
+        else if (o.status === 'Đã cứu') rescued++;
+        else if (o.status === 'Không nghe') missed++;
+        else if (o.status === 'Hủy') cancelled++;
+      });
+
+      if (document.getElementById('count-abandoned-all')) document.getElementById('count-abandoned-all').textContent = total;
+      if (document.getElementById('count-abandoned-pending')) document.getElementById('count-abandoned-pending').textContent = pending;
+      if (document.getElementById('count-abandoned-rescued')) document.getElementById('count-abandoned-rescued').textContent = rescued;
+      if (document.getElementById('count-abandoned-missed')) document.getElementById('count-abandoned-missed').textContent = missed;
+      if (document.getElementById('count-abandoned-cancelled')) document.getElementById('count-abandoned-cancelled').textContent = cancelled;
+    }
+
+    function renderAbandonedTable() {
+      const tbody = document.getElementById('abandonedTableBody');
+      if (!tbody) return;
+      tbody.innerHTML = '';
+
+      let list = [...abandonedData];
+
+      // Filter status
+      if (currentAbandonedFilter !== 'all') {
+        list = list.filter(o => o.status === currentAbandonedFilter);
+      }
+
+      // Search query
+      if (searchAbandonedQuery) {
+        const q = searchAbandonedQuery.toLowerCase();
+        list = list.filter(o => 
+          (o.full_name || '').toLowerCase().includes(q) ||
+          (o.phone_number || '').includes(q) ||
+          (o.order_id || '').toLowerCase().includes(q) ||
+          (o.product || '').toLowerCase().includes(q) ||
+          (o.province || '').toLowerCase().includes(q)
+        );
+      }
+
+      if (list.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:40px;color:var(--text-dim);">Không có đơn rớt nào phù hợp với bộ lọc.</td></tr>`;
+        return;
+      }
+
+      list.reverse();
+
+      list.forEach(lead => {
+        const realIndex = abandonedData.findIndex(o => o.order_id === lead.order_id);
+        const cleanPhone = (lead.phone_number || '').replace(/[^0-9]/g, '');
+
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>
+            <span class="order-id-badge" style="background: rgba(239, 68, 68, 0.15); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.3); font-weight:700;">${lead.order_id || 'ROT-UNKNOWN'}</span>
+            <div class="order-time-text">${lead.order_time || ''}</div>
+          </td>
+          <td>
+            <div class="cust-info-box">
+              <span class="cust-name">${lead.full_name || 'Khách chưa nhập tên'}</span>
+              <div class="cust-phone">
+                <span style="font-weight:700;color:#fff;">${lead.phone_number || ''}</span>
+                ${cleanPhone ? `
+                  <a href="tel:${cleanPhone}" class="quick-call-btn" title="Gọi ngay">📞 Gọi</a>
+                  <a href="https://zalo.me/${cleanPhone}" target="_blank" class="quick-zalo-btn" title="Chat Zalo">💬 Zalo</a>
+                ` : ''}
+              </div>
+            </div>
+          </td>
+          <td>
+            <div style="font-size:12px;max-width:200px;line-height:1.4;">
+              ${lead.address || ''}${lead.district ? ', ' + lead.district : ''}${lead.province ? ', ' + lead.province : ''}
+            </div>
+            <div style="font-size:11px;color:#ef4444;margin-top:2px;">⚠️ ${lead.note || 'Rớt đơn Form / Thoát trang'}</div>
+          </td>
+          <td>
+            <div class="product-info-box">
+              <span class="product-name-text">${lead.product || 'Giày bảo hộ'}</span>
+              <span class="product-spec-pill">Size: ${lead.size || '40'} | SL: ${lead.quantity || 1} đôi</span>
+            </div>
+          </td>
+          <td>
+            <div class="price-amount" style="color:#FFC400;">${lead.total_amount || lead.price || '329.000đ'}</div>
+          </td>
+          <td>
+            <select class="setting-input" style="padding:4px 8px;font-size:12px;width:auto;" onchange="changeAbandonedStatus(${realIndex}, this.value)">
+              <option value="Chưa gọi" ${lead.status === 'Chưa gọi' ? 'selected' : ''}>🔴 Chưa gọi</option>
+              <option value="Đã cứu" ${lead.status === 'Đã cứu' ? 'selected' : ''}>🟢 Đã cứu thành công</option>
+              <option value="Không nghe" ${lead.status === 'Không nghe' ? 'selected' : ''}>🟡 Không nghe máy</option>
+              <option value="Hủy" ${lead.status === 'Hủy' ? 'selected' : ''}>⚫ Bỏ qua / Hủy</option>
+            </select>
+          </td>
+          <td>
+            <div style="display:flex;align-items:center;gap:6px;">
+              <button onclick="convertAbandonedToOrder(${realIndex})" class="btn-action" style="padding:4px 8px;font-size:11.5px;white-space:nowrap;background:linear-gradient(135deg,#22c55e,#16a34a);border-color:#16a34a;color:#fff;" title="Chuyển thành đơn thật">✓ Cứu thành công</button>
+              <button onclick="confirmDeleteAbandoned(${realIndex})" class="btn-icon delete" title="Xóa đơn rớt">🗑️</button>
+            </div>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function handleSearchAbandoned() {
+      searchAbandonedQuery = document.getElementById('abandonedSearchInput').value.trim();
+      renderAbandonedTable();
+    }
+
+    function filterAbandonedByStatus(status, btn) {
+      currentAbandonedFilter = status;
+      document.querySelectorAll('#tab-abandoned .filter-chips .chip-btn').forEach(b => b.classList.remove('active'));
+      if (btn) btn.classList.add('active');
+      renderAbandonedTable();
+    }
+
+    function changeAbandonedStatus(index, newStatus) {
+      if (abandonedData[index]) {
+        abandonedData[index].status = newStatus;
+        saveAbandonedOrders();
+        showToast(`✓ Đã cập nhật trạng thái đơn rớt: ${newStatus}`);
+      }
+    }
+
+    function convertAbandonedToOrder(index) {
+      const lead = abandonedData[index];
+      if (!lead) return;
+
+      if (confirm(`Chuyển khách [${lead.full_name}] (${lead.phone_number}) thành đơn hàng chính thức để xử lý và giao hàng?`)) {
+        const now = new Date();
+        const dateStr = now.toISOString().slice(2, 10).replace(/-/g, '');
+        const randStr = Math.random().toString(36).substring(2, 6).toUpperCase();
+        const officialOrderId = `DH-${dateStr}-${randStr}`;
+
+        const newOrder = {
+          order_id: officialOrderId,
+          order_time: now.toLocaleString('vi-VN', { timeZone: 'Asia/Ho_Chi_Minh' }),
+          full_name: lead.full_name || 'Khách hàng',
+          phone_number: lead.phone_number,
+          province: lead.province || '',
+          district: lead.district || '',
+          address: lead.address || '',
+          product: lead.product || 'Giày Safety Cổ Thấp',
+          size: lead.size || '40',
+          quantity: lead.quantity || 1,
+          price: lead.price || '329.000đ',
+          total_amount: lead.total_amount || '329.000đ',
+          status: 'Đã gọi chốt',
+          note: '🎉 Cứu đơn thành công từ Đơn Rớt (' + (lead.order_id || '') + ')'
+        };
+
+        ordersData.push(newOrder);
+        saveOrders();
+
+        lead.status = 'Đã cứu';
+        saveAbandonedOrders();
+
+        showToast(`🎉 Tuyệt vời! Đã cứu thành công đơn của khách ${lead.full_name} (${officialOrderId})!`);
+        switchTab('orders');
+      }
+    }
+
+    function confirmDeleteAbandoned(index) {
+      const lead = abandonedData[index];
+      if (!lead) return;
+      if (confirm(`Bạn có chắc chắn muốn xóa thông tin đơn rớt của khách ${lead.full_name} (${lead.phone_number})?`)) {
+        abandonedData.splice(index, 1);
+        saveAbandonedOrders();
+        showToast('✓ Đã xóa đơn rớt thành công!');
+      }
+    }
+
+    function clearAllAbandoned() {
+      if (abandonedData.length === 0) {
+        alert('Danh sách đơn rớt hiện đang trống!');
+        return;
+      }
+      if (confirm(`Bạn có chắc chắn muốn xóa TOÀN BỘ ${abandonedData.length} đơn rớt? Hành động này không thể hoàn tác!`)) {
+        abandonedData = [];
+        saveAbandonedOrders();
+        showToast('✓ Đã làm sạch toàn bộ đơn rớt!');
+      }
+    }
+
+    function exportAbandonedToCSV() {
+      if (abandonedData.length === 0) {
+        alert('Chưa có dữ liệu đơn rớt để xuất file!');
+        return;
+      }
+
+      let csv = '\uFEFF';
+      csv += 'Mã Đơn Rớt,Thời Gian,Họ Tên Khách,Số Điện Thoại,Tỉnh Thành,Quận Huyện,Địa Chỉ,Sản Phẩm Quan Tâm,Size,Số Lượng,Giá Dự Kiến,Trạng Thái,Ghi Chú\n';
+
+      abandonedData.forEach(o => {
+        csv += `"${o.order_id || ''}","${o.order_time || ''}","${(o.full_name || '').replace(/"/g, '""')}","'${o.phone_number || ''}","${o.province || ''}","${o.district || ''}","${(o.address || '').replace(/"/g, '""')}","${o.product || ''}","${o.size || ''}","${o.quantity || 1}","${o.total_amount || ''}","${o.status || ''}","${(o.note || '').replace(/"/g, '""')}"\n`;
+      });
+
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `Don_Rot_Can_Cuu_${new Date().toISOString().slice(0,10)}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      showToast('✓ Đã tải file CSV Đơn Rớt thành công!');
+    }
+
     // Dashboard KPIs & Charts
     function updateDashboardKPIs() {
       let totalRev = 0;
@@ -2148,6 +2480,8 @@
       const rate = ordersData.length > 0 ? Math.round((successCount / ordersData.length) * 100) : 0;
       document.getElementById('kpiConversionRate').textContent = `Tỉ lệ chốt: ${rate}%`;
       document.getElementById('kpiTodayRevenue').textContent = todayRev.toLocaleString('vi-VN') + 'đ';
+      const kpiAbandoned = document.getElementById('kpiAbandonedOrders');
+      if (kpiAbandoned) kpiAbandoned.textContent = abandonedData.length;
 
       // Render 7-day bar chart
       const chartEl = document.getElementById('revenueBarChart');
