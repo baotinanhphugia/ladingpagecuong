@@ -2,6 +2,7 @@
  * =========================================================================================
  * GOOGLE APPS SCRIPT BACKEND CHO LANDING PAGE GIÀY THỂ THAO BẢO HỘ HÙNG VIỆT
  * Nhận đơn hàng từ Landing Page & Admin -> Lưu tự động vào Google Sheet "Orders"
+ * Tự động tạo và lưu trữ cấu hình bảo mật vào Sheet "Config"
  * Hỗ trợ thông báo tức thì về Telegram Bot & Email
  * Cung cấp API GET/POST cho trang quản trị Admin (Đồng bộ, cập nhật, xóa đơn hàng)
  * =========================================================================================
@@ -11,7 +12,7 @@ const SHEET_ORDERS_NAME = "Orders";
 const SHEET_CONFIG_NAME = "Config";
 
 /**
- * 1. Xử lý GET request (Kiểm tra ping hoặc lấy danh sách đơn cho Admin)
+ * 1. Xử lý GET request (Kiểm tra ping, lấy danh sách đơn, lấy cấu hình)
  */
 function doGet(e) {
   const action = (e && e.parameter && e.parameter.action) || "ping";
@@ -19,7 +20,7 @@ function doGet(e) {
   if (action === "getOrders") {
     return getOrdersList_();
   } else if (action === "getConfig") {
-    return getConfig_();
+    return getConfigJson_();
   }
 
   return ContentService.createTextOutput(JSON.stringify({
@@ -78,6 +79,21 @@ function doPost(e) {
  * 3. Lưu đơn hàng mới vào Sheet Orders
  */
 function saveNewOrder_(data) {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  let sheet = ss.getSheetByName(SHEET_ORDERS_NAME);
+  if (!sheet) {
+    sheet = ss.insertSheet(SHEET_ORDERS_NAME);
+    const headers = [
+      "Thời gian", "Mã đơn hàng", "Họ và tên", "Số điện thoại",
+      "Tỉnh / Thành", "Quận / Huyện", "Địa chỉ chi tiết",
+      "Sản phẩm", "Size", "Số lượng", "Đơn giá", "Tổng tiền",
+      "Trạng thái", "Ghi chú"
+    ];
+    sheet.appendRow(headers);
+    sheet.getRange(1, 1, 1, headers.length).setBackground("#111827").setFontColor("#FFC400").setFontWeight("bold");
+    sheet.setFrozenRows(1);
+  }
+
   const now = new Date();
   const timeFormatted = Utilities.formatDate(now, "GMT+7", "dd/MM/yyyy HH:mm:ss");
   
@@ -99,46 +115,37 @@ function saveNewOrder_(data) {
   const address = (data.address || "").toString().trim();
   const fullAddress = address + (district ? ", " + district : "") + (province ? ", " + province : "");
 
-  const product = (data.product || "Giày Bảo Hộ").toString().trim();
+  const product = (data.product || "Giày Bảo Hộ Hùng Việt").toString().trim();
   const size = (data.size || "40").toString().trim();
-  const quantity = parseInt(data.quantity) || 1;
-  const price = data.price || "329.000đ";
-  const totalAmount = data.total_amount || price;
-  const status = data.status || "Chờ xác nhận";
-  const note = (data.note || "Đơn đặt từ Landing Page").toString().trim();
+  const quantity = parseInt(data.quantity || 1, 10);
+  const price = (data.price || "329.000đ").toString().trim();
+  const totalAmount = (data.total_amount || data.price || "329.000đ").toString().trim();
+  const status = (data.status || "Chờ xác nhận").toString().trim();
+  const note = (data.note || "").toString().trim();
 
-  // Khởi tạo sheet nếu chưa có
-  const ss = SpreadsheetApp.getActiveSpreadsheet();
-  let sheet = ss.getSheetByName(SHEET_ORDERS_NAME);
-
-  if (!sheet) {
-    sheet = ss.insertSheet(SHEET_ORDERS_NAME);
-    const headers = [
-      "Thời gian", "Mã đơn hàng", "Họ và tên", "Số điện thoại",
-      "Tỉnh / Thành", "Quận / Huyện", "Địa chỉ chi tiết",
-      "Sản phẩm", "Size", "Số lượng", "Đơn giá", "Tổng tiền",
-      "Trạng thái", "Ghi chú"
-    ];
-    sheet.appendRow(headers);
-    const headerRange = sheet.getRange(1, 1, 1, headers.length);
-    headerRange.setBackground("#111827")
-               .setFontColor("#FFC400")
-               .setFontWeight("bold")
-               .setHorizontalAlignment("center");
-    sheet.setFrozenRows(1);
-  }
-
-  // Ghi đơn vào sheet
+  // Thêm dòng đơn hàng mới vào Google Sheet
   sheet.appendRow([
-    timeFormatted, orderId, fullName, phoneFormatted,
-    province, district, address, product, size,
-    quantity, price, totalAmount, status, note
+    timeFormatted,
+    orderId,
+    fullName,
+    phoneFormatted,
+    province,
+    district,
+    address,
+    product,
+    size,
+    quantity,
+    price,
+    totalAmount,
+    status,
+    note
   ]);
 
-  // Thông báo Telegram Bot
+  // Gửi thông báo Telegram (nếu đã cấu hình Bot Token & Chat ID)
   try {
     sendTelegramNotification({
       orderId: orderId,
+      time: timeFormatted,
       fullName: fullName,
       phone: rawPhone,
       address: fullAddress,
@@ -146,16 +153,17 @@ function saveNewOrder_(data) {
       size: size,
       quantity: quantity,
       totalAmount: totalAmount,
-      time: timeFormatted
+      note: note
     });
-  } catch (e) {
-    Logger.log("Telegram Error: " + e.toString());
+  } catch (err) {
+    Logger.log("Lỗi gửi Telegram: " + err.toString());
   }
 
-  // Thông báo Email nếu có cấu hình
+  // Gửi email thông báo (nếu có cấu hình email)
   try {
     sendEmailNotification({
       orderId: orderId,
+      time: timeFormatted,
       fullName: fullName,
       phone: rawPhone,
       address: fullAddress,
@@ -163,30 +171,159 @@ function saveNewOrder_(data) {
       size: size,
       quantity: quantity,
       totalAmount: totalAmount,
-      time: timeFormatted
+      note: note
     });
-  } catch (e) {
-    Logger.log("Email Error: " + e.toString());
+  } catch (err) {
+    Logger.log("Lỗi gửi Email: " + err.toString());
   }
 
   return ContentService.createTextOutput(JSON.stringify({
     status: "success",
-    order_id: orderId,
-    message: "Đơn hàng đã được lưu thành công vào Google Sheet!"
+    message: "Đã lưu đơn hàng thành công vào Google Sheet!",
+    order_id: orderId
   })).setMimeType(ContentService.MimeType.JSON);
 }
 
 /**
- * 4. Gửi thông báo Telegram Bot
+ * 4. Lưu cấu hình vào Sheet Config & Script Properties
+ */
+function saveConfig_(cfg) {
+  if (!cfg) return jsonError_("Dữ liệu cấu hình rỗng!");
+
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  let sheet = ss.getSheetByName(SHEET_CONFIG_NAME);
+  if (!sheet) {
+    sheet = ss.insertSheet(SHEET_CONFIG_NAME);
+    const headers = ["Thông số (Key)", "Giá trị (Value)", "Mô tả / Hướng dẫn", "Cập nhật lần cuối"];
+    sheet.appendRow(headers);
+    sheet.getRange(1, 1, 1, headers.length).setBackground("#111827").setFontColor("#FFC400").setFontWeight("bold");
+    sheet.setFrozenRows(1);
+  }
+
+  const nowFormatted = Utilities.formatDate(new Date(), "GMT+7", "dd/MM/yyyy HH:mm:ss");
+
+  const configMap = [
+    ["TELEGRAM_BOT_TOKEN", cfg.telegramBotToken || "", "Token Bot Telegram từ @BotFather", nowFormatted],
+    ["TELEGRAM_CHAT_ID", cfg.telegramChatId || "", "Chat ID nhóm hoặc kênh Telegram nhận đơn", nowFormatted],
+    ["NOTIFY_EMAIL", cfg.notifyEmail || "", "Email nhận thông báo đơn hàng mới tức thì", nowFormatted],
+    ["FB_PIXEL_ID", cfg.fbPixelId || "", "Mã Facebook / Meta Pixel theo dõi chuyển đổi", nowFormatted],
+    ["GOOGLE_PIXEL_ID", cfg.googlePixelId || "", "Mã Google Ads / GA4 Measurement ID", nowFormatted],
+    ["TIKTOK_PIXEL_ID", cfg.tiktokPixelId || "", "Mã TikTok Pixel đo lường đơn hàng", nowFormatted],
+    ["SHOP_PHONE", cfg.shopPhone || "", "Số Hotline / Zalo chính của xưởng", nowFormatted],
+    ["SHOP_ADDRESS", cfg.shopAddress || "", "Địa chỉ xưởng sản xuất", nowFormatted],
+    ["ADMIN_PIN", cfg.adminPin || "", "Mã PIN bảo mật mở khóa trang quản trị Admin", nowFormatted]
+  ];
+
+  // Xóa nội dung cũ từ dòng 2
+  const lastRow = sheet.getLastRow();
+  if (lastRow > 1) {
+    sheet.getRange(2, 1, lastRow - 1, 4).clearContent();
+  }
+
+  sheet.getRange(2, 1, configMap.length, 4).setValues(configMap);
+  sheet.autoResizeColumns(1, 4);
+
+  // Đồng thời lưu vào ScriptProperties để các trigger đọc tức thì
+  const props = PropertiesService.getScriptProperties();
+  props.setProperties({
+    TELEGRAM_BOT_TOKEN: cfg.telegramBotToken || "",
+    TELEGRAM_CHAT_ID: cfg.telegramChatId || "",
+    NOTIFY_EMAIL: cfg.notifyEmail || "",
+    FB_PIXEL_ID: cfg.fbPixelId || "",
+    GOOGLE_PIXEL_ID: cfg.googlePixelId || "",
+    TIKTOK_PIXEL_ID: cfg.tiktokPixelId || "",
+    SHOP_PHONE: cfg.shopPhone || "",
+    SHOP_ADDRESS: cfg.shopAddress || ""
+  });
+
+  return ContentService.createTextOutput(JSON.stringify({
+    status: "success",
+    message: "Đã lưu toàn bộ dữ liệu cấu hình & bảo mật vào Google Sheet thành công!"
+  })).setMimeType(ContentService.MimeType.JSON);
+}
+
+/**
+ * 5. Đọc cấu hình từ Sheet Config
+ */
+function getConfigJson_() {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const sheet = ss.getSheetByName(SHEET_CONFIG_NAME);
+  if (!sheet) {
+    return ContentService.createTextOutput(JSON.stringify({ status: "success", config: {} })).setMimeType(ContentService.MimeType.JSON);
+  }
+
+  const values = sheet.getDataRange().getValues();
+  const config = {};
+  for (let i = 1; i < values.length; i++) {
+    const k = values[i][0];
+    const v = values[i][1];
+    if (k === "TELEGRAM_BOT_TOKEN") config.telegramBotToken = v;
+    else if (k === "TELEGRAM_CHAT_ID") config.telegramChatId = v;
+    else if (k === "NOTIFY_EMAIL") config.notifyEmail = v;
+    else if (k === "FB_PIXEL_ID") config.fbPixelId = v;
+    else if (k === "GOOGLE_PIXEL_ID") config.googlePixelId = v;
+    else if (k === "TIKTOK_PIXEL_ID") config.tiktokPixelId = v;
+    else if (k === "SHOP_PHONE") config.shopPhone = v;
+    else if (k === "SHOP_ADDRESS") config.shopAddress = v;
+    else if (k === "ADMIN_PIN") config.adminPin = v;
+  }
+
+  return ContentService.createTextOutput(JSON.stringify({
+    status: "success",
+    config: config
+  })).setMimeType(ContentService.MimeType.JSON);
+}
+
+/**
+ * 6. Lấy danh sách đơn hàng cho Admin
+ */
+function getOrdersList_() {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const sheet = ss.getSheetByName(SHEET_ORDERS_NAME);
+  if (!sheet) {
+    return ContentService.createTextOutput(JSON.stringify({ status: "success", orders: [] })).setMimeType(ContentService.MimeType.JSON);
+  }
+
+  const values = sheet.getDataRange().getValues();
+  const orders = [];
+
+  for (let i = 1; i < values.length; i++) {
+    const row = values[i];
+    if (!row[1]) continue;
+    orders.push({
+      order_time: row[0],
+      order_id: row[1],
+      full_name: row[2],
+      phone_number: (row[3] || "").toString().replace(/^'/, ""),
+      province: row[4],
+      district: row[5],
+      address: row[6],
+      product: row[7],
+      size: row[8],
+      quantity: row[9],
+      price: row[10],
+      total_amount: row[11],
+      status: row[12],
+      note: row[13]
+    });
+  }
+
+  return ContentService.createTextOutput(JSON.stringify({
+    status: "success",
+    orders: orders
+  })).setMimeType(ContentService.MimeType.JSON);
+}
+
+/**
+ * 7. Gửi thông báo Telegram
  */
 function sendTelegramNotification(order) {
   const props = PropertiesService.getScriptProperties();
   const botToken = props.getProperty("TELEGRAM_BOT_TOKEN");
   const chatId = props.getProperty("TELEGRAM_CHAT_ID");
-
   if (!botToken || !chatId) return;
 
-  const msg = 
+  const msg =
     "🛒 <b>ĐƠN HÀNG MỚI - XƯỞNG GIÀY HÙNG VIỆT</b>\n" +
     "━━━━━━━━━━━━━━━━━━━\n" +
     "🆔 <b>Mã đơn:</b> <code>" + order.orderId + "</code>\n" +
@@ -196,6 +333,7 @@ function sendTelegramNotification(order) {
     "📍 <b>Địa chỉ:</b> " + order.address + "\n" +
     "👟 <b>Sản phẩm:</b> " + order.product + " (Size: " + order.size + " | SL: " + order.quantity + " đôi)\n" +
     "💰 <b>Tổng tiền:</b> <b>" + order.totalAmount + "</b>\n" +
+    "📝 <b>Ghi chú:</b> " + (order.note || "Không có") + "\n" +
     "━━━━━━━━━━━━━━━━━━━\n" +
     "⚡ <i>Vui lòng gọi xác nhận đơn sớm cho khách!</i>";
 
@@ -222,7 +360,7 @@ function sendTelegramNotification(order) {
 }
 
 /**
- * 5. Gửi thông báo Email
+ * 8. Gửi thông báo Email
  */
 function sendEmailNotification(order) {
   const props = PropertiesService.getScriptProperties();
@@ -256,47 +394,7 @@ function sendEmailNotification(order) {
 }
 
 /**
- * 6. Lấy danh sách đơn hàng cho Admin
- */
-function getOrdersList_() {
-  const ss = SpreadsheetApp.getActiveSpreadsheet();
-  const sheet = ss.getSheetByName(SHEET_ORDERS_NAME);
-  if (!sheet) {
-    return ContentService.createTextOutput(JSON.stringify({ status: "success", orders: [] })).setMimeType(ContentService.MimeType.JSON);
-  }
-
-  const values = sheet.getDataRange().getValues();
-  const orders = [];
-
-  for (let i = 1; i < values.length; i++) {
-    const row = values[i];
-    if (!row[1]) continue; // bỏ qua nếu không có mã đơn
-    orders.push({
-      order_time: row[0],
-      order_id: row[1],
-      full_name: row[2],
-      phone_number: (row[3] || "").toString().replace(/^'/, ""),
-      province: row[4],
-      district: row[5],
-      address: row[6],
-      product: row[7],
-      size: row[8],
-      quantity: row[9],
-      price: row[10],
-      total_amount: row[11],
-      status: row[12],
-      note: row[13]
-    });
-  }
-
-  return ContentService.createTextOutput(JSON.stringify({
-    status: "success",
-    orders: orders
-  })).setMimeType(ContentService.MimeType.JSON);
-}
-
-/**
- * 7. Cập nhật trạng thái đơn hàng
+ * 9. Cập nhật trạng thái đơn hàng
  */
 function updateOrderStatus_(orderId, newStatus) {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
@@ -306,7 +404,7 @@ function updateOrderStatus_(orderId, newStatus) {
   const values = sheet.getDataRange().getValues();
   for (let i = 1; i < values.length; i++) {
     if (values[i][1] === orderId) {
-      sheet.getRange(i + 1, 13).setValue(newStatus); // Cột 13: Trạng thái
+      sheet.getRange(i + 1, 13).setValue(newStatus);
       return ContentService.createTextOutput(JSON.stringify({ status: "success", message: "Đã cập nhật trạng thái đơn!" })).setMimeType(ContentService.MimeType.JSON);
     }
   }
@@ -315,7 +413,7 @@ function updateOrderStatus_(orderId, newStatus) {
 }
 
 /**
- * 8. Xóa đơn hàng
+ * 10. Xóa đơn hàng
  */
 function deleteOrder_(orderId) {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
@@ -331,20 +429,6 @@ function deleteOrder_(orderId) {
   }
 
   return jsonError_("Không tìm thấy mã đơn: " + orderId);
-}
-
-/**
- * 9. Lưu cấu hình vào Script Properties và Sheet Config
- */
-function saveConfig_(cfg) {
-  if (!cfg) return jsonError_("Dữ liệu cấu hình rỗng");
-
-  const props = PropertiesService.getScriptProperties();
-  if (cfg.telegramBotToken) props.setProperty("TELEGRAM_BOT_TOKEN", cfg.telegramBotToken);
-  if (cfg.telegramChatId) props.setProperty("TELEGRAM_CHAT_ID", cfg.telegramChatId);
-  if (cfg.notifyEmail) props.setProperty("NOTIFY_EMAIL", cfg.notifyEmail);
-
-  return ContentService.createTextOutput(JSON.stringify({ status: "success", message: "Đã lưu cấu hình thành công!" })).setMimeType(ContentService.MimeType.JSON);
 }
 
 function jsonError_(msg) {

@@ -2570,7 +2570,7 @@ function getStoredSystemConfig() {
   }
 }
 const sysConfig = getStoredSystemConfig();
-const APPS_SCRIPT_URL = sysConfig.appsScriptUrl || "YOUR_GOOGLE_APPS_SCRIPT_URL_HERE";
+const APPS_SCRIPT_URL = sysConfig.appsScriptUrl || "https://script.google.com/macros/s/AKfycbx4g8e8gEShYwoHSxT9o-4I1z_o5huiv22rTfnoWwuw2K3s5WsCrQm3Kwhv2fcK6FPFtA/exec";
 
 // Tự động kích hoạt Facebook Pixel từ cấu hình Admin (hoặc mặc định đã nạp tại thẻ head)
 const activeFbPixel = window.ACTIVE_FB_PIXEL_ID || sysConfig.fbPixelId || '1441661348054461';
@@ -3129,7 +3129,7 @@ initGallery(document.getElementById('w-3zkb84sy'), { autoplay: false });
         fetch(APPS_SCRIPT_URL, {
           method: 'POST',
           mode: 'no-cors',
-          headers: { 'Content-Type': 'application/json' },
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
           body: JSON.stringify({ ...leadData, is_partial_lead: true })
         }).catch(() => {});
       }
@@ -3748,7 +3748,7 @@ initGallery(document.getElementById('w-3zkb84sy'), { autoplay: false });
         await fetch(APPS_SCRIPT_URL, {
           method: 'POST',
           mode: 'no-cors',
-          headers: { 'Content-Type': 'application/json' },
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
           body: JSON.stringify(orderData)
         });
       } catch (err) {

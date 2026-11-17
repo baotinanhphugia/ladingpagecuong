@@ -1746,7 +1746,7 @@
       document.getElementById('cfgTeleToken').value = config.telegramBotToken || '';
       document.getElementById('cfgTeleChatId').value = config.telegramChatId || '';
       document.getElementById('cfgEmail').value = config.notifyEmail || '';
-      document.getElementById('cfgAppsScriptUrl').value = config.appsScriptUrl || '';
+      document.getElementById('cfgAppsScriptUrl').value = config.appsScriptUrl || 'https://script.google.com/macros/s/AKfycbx4g8e8gEShYwoHSxT9o-4I1z_o5huiv22rTfnoWwuw2K3s5WsCrQm3Kwhv2fcK6FPFtA/exec';
       document.getElementById('cfgFbPixel').value = config.fbPixelId || '1441661348054461';
       document.getElementById('cfgGooglePixel').value = config.googlePixelId || '';
       document.getElementById('cfgTiktokPixel').value = config.tiktokPixelId || '';
@@ -1781,7 +1781,7 @@
         fetch(config.appsScriptUrl, {
           method: 'POST',
           mode: 'no-cors',
-          headers: { 'Content-Type': 'application/json' },
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
           body: JSON.stringify({ action: 'saveConfig', config: config })
         }).catch(() => {});
       }
@@ -2769,7 +2769,6 @@ function getOrdersJson_() {
   const sheet = ss.getSheetByName(SHEET_ORDERS_NAME);
   if (!sheet) return ContentService.createTextOutput(JSON.stringify({ status: "success", orders: [] })).setMimeType(ContentService.MimeType.JSON);
   const rows = sheet.getDataRange().getValues();
-  const headers = rows[0];
   const list = [];
   for (let i = 1; i < rows.length; i++) {
     const r = rows[i];
@@ -2780,6 +2779,76 @@ function getOrdersJson_() {
     });
   }
   return ContentService.createTextOutput(JSON.stringify({ status: "success", orders: list })).setMimeType(ContentService.MimeType.JSON);
+}
+
+function saveConfig_(cfg) {
+  if (!cfg) return ContentService.createTextOutput(JSON.stringify({ status: "error", message: "Dữ liệu cấu hình rỗng" })).setMimeType(ContentService.MimeType.JSON);
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  let sheet = ss.getSheetByName(SHEET_CONFIG_NAME);
+  if (!sheet) {
+    sheet = ss.insertSheet(SHEET_CONFIG_NAME);
+    const headers = ["Thông số (Key)", "Giá trị (Value)", "Mô tả", "Cập nhật lần cuối"];
+    sheet.appendRow(headers);
+    sheet.getRange(1, 1, 1, headers.length).setBackground("#111827").setFontColor("#FFC400").setFontWeight("bold");
+    sheet.setFrozenRows(1);
+  }
+
+  const nowFormatted = Utilities.formatDate(new Date(), "GMT+7", "dd/MM/yyyy HH:mm:ss");
+  const configMap = [
+    ["TELEGRAM_BOT_TOKEN", cfg.telegramBotToken || "", "Token Bot Telegram từ @BotFather", nowFormatted],
+    ["TELEGRAM_CHAT_ID", cfg.telegramChatId || "", "Chat ID nhóm hoặc kênh Telegram nhận đơn", nowFormatted],
+    ["NOTIFY_EMAIL", cfg.notifyEmail || "", "Email nhận thông báo đơn hàng mới tức thì", nowFormatted],
+    ["FB_PIXEL_ID", cfg.fbPixelId || "", "Mã Facebook / Meta Pixel theo dõi chuyển đổi", nowFormatted],
+    ["GOOGLE_PIXEL_ID", cfg.googlePixelId || "", "Mã Google Ads / GA4 Measurement ID", nowFormatted],
+    ["TIKTOK_PIXEL_ID", cfg.tiktokPixelId || "", "Mã TikTok Pixel đo lường đơn hàng", nowFormatted],
+    ["SHOP_PHONE", cfg.shopPhone || "", "Số Hotline / Zalo chính của xưởng", nowFormatted],
+    ["SHOP_ADDRESS", cfg.shopAddress || "", "Địa chỉ xưởng sản xuất", nowFormatted],
+    ["ADMIN_PIN", cfg.adminPin || "", "Mã PIN bảo mật mở khóa trang quản trị Admin", nowFormatted]
+  ];
+
+  const lastRow = sheet.getLastRow();
+  if (lastRow > 1) {
+    sheet.getRange(2, 1, lastRow - 1, 4).clearContent();
+  }
+
+  sheet.getRange(2, 1, configMap.length, 4).setValues(configMap);
+  sheet.autoResizeColumns(1, 4);
+
+  const props = PropertiesService.getScriptProperties();
+  props.setProperties({
+    TELEGRAM_BOT_TOKEN: cfg.telegramBotToken || "",
+    TELEGRAM_CHAT_ID: cfg.telegramChatId || "",
+    NOTIFY_EMAIL: cfg.notifyEmail || "",
+    FB_PIXEL_ID: cfg.fbPixelId || "",
+    GOOGLE_PIXEL_ID: cfg.googlePixelId || "",
+    TIKTOK_PIXEL_ID: cfg.tiktokPixelId || "",
+    SHOP_PHONE: cfg.shopPhone || "",
+    SHOP_ADDRESS: cfg.shopAddress || ""
+  });
+
+  return ContentService.createTextOutput(JSON.stringify({ status: "success", message: "Đã lưu cấu hình & bảo mật vào Google Sheet thành công!" })).setMimeType(ContentService.MimeType.JSON);
+}
+
+function getConfigJson_() {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const sheet = ss.getSheetByName(SHEET_CONFIG_NAME);
+  if (!sheet) return ContentService.createTextOutput(JSON.stringify({ status: "success", config: {} })).setMimeType(ContentService.MimeType.JSON);
+  const values = sheet.getDataRange().getValues();
+  const config = {};
+  for (let i = 1; i < values.length; i++) {
+    const k = values[i][0];
+    const v = values[i][1];
+    if (k === "TELEGRAM_BOT_TOKEN") config.telegramBotToken = v;
+    else if (k === "TELEGRAM_CHAT_ID") config.telegramChatId = v;
+    else if (k === "NOTIFY_EMAIL") config.notifyEmail = v;
+    else if (k === "FB_PIXEL_ID") config.fbPixelId = v;
+    else if (k === "GOOGLE_PIXEL_ID") config.googlePixelId = v;
+    else if (k === "TIKTOK_PIXEL_ID") config.tiktokPixelId = v;
+    else if (k === "SHOP_PHONE") config.shopPhone = v;
+    else if (k === "SHOP_ADDRESS") config.shopAddress = v;
+    else if (k === "ADMIN_PIN") config.adminPin = v;
+  }
+  return ContentService.createTextOutput(JSON.stringify({ status: "success", config: config })).setMimeType(ContentService.MimeType.JSON);
 }`;
 
       document.getElementById('codeGsText').textContent = code;
