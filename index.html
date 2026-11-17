@@ -448,6 +448,22 @@ KIỂM TRA TRƯỚC – THANH TOÁN SAU
 }
 
 
+
+/* Frame overlay for Hero banner (#w-tbsrn9jk đè lên ảnh #w-5laelrfx) */
+#w-kliw4nrm {
+  z-index: 1 !important;
+}
+#w-5laelrfx {
+  z-index: 2 !important;
+}
+#w-tbsrn9jk {
+  z-index: 10 !important;
+  pointer-events: none !important;
+}
+#w-tbsrn9jk * {
+  pointer-events: none !important;
+}
+
 /* =========================================================
    VIDEO PLAYER STYLES (#w-i5zkeukv)
    ========================================================= */
@@ -540,14 +556,14 @@ KIỂM TRA TRƯỚC – THANH TOÁN SAU
   transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.3s ease;
   display: none;
   opacity: 0;
-  z-index: 1;
-}
+  }
+
 .gallery-view-item.active {
   display: block;
   opacity: 1;
   transform: translate3d(0, 0, 0);
-  z-index: 2;
-}
+  }
+
 .gallery-view-item.slide-left {
   display: block;
   transform: translate3d(-100%, 0, 0);
