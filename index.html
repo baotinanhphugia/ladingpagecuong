@@ -205,9 +205,31 @@
 
 
       <script type="text/javascript">
-        !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window, document,'script','https://connect.facebook.net/en_US/fbevents.js');
-fbq("init", "1441661348054461", {external_id: window.pixel_external_id});;
-        fbq("track", "PageView", {}, {eventID: "webcake.xrhi4rxiaa"});
+        // Meta (Facebook) Pixel Code - Tích hợp động từ Admin CRM & Fallback an toàn
+        (function() {
+          var fbPixelId = '1441661348054461';
+          try {
+            var cfg = JSON.parse(localStorage.getItem('giaythethao_config') || '{}');
+            if (cfg.fbPixelId && cfg.fbPixelId.trim()) fbPixelId = cfg.fbPixelId.trim();
+          } catch(e) {}
+          window.ACTIVE_FB_PIXEL_ID = fbPixelId;
+
+          !function(f,b,e,v,n,t,s)
+          {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+          n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+          if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+          n.queue=[];t=b.createElement(e);t.async=!0;
+          t.src=v;s=b.getElementsByTagName(e)[0];
+          s.parentNode.insertBefore(t,s)}(window, document,'script',
+          'https://connect.facebook.net/en_US/fbevents.js');
+
+          fbq('init', fbPixelId);
+          fbq('track', 'PageView');
+          fbq('track', 'ViewContent', {
+            content_name: 'Giày Bảo Hộ Hùng Việt',
+            content_category: 'Giày Bảo Hộ Lao Động'
+          });
+        })();
       </script>
 
 
@@ -279,7 +301,7 @@ fbq("init", "1441661348054461", {external_id: window.pixel_external_id});;
               class="gallery-view-item p-absolute " 
               data-index="8"   
               role="img" aria-label=""
-            ></div><div class="gallery-view-icon-next"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJjdXJyZW50Q29sb3IiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIj48cGF0aCBkPSJtOSAxOCA2LTYtNi02Ij48L3BhdGg+PC9zdmc+" alt="navigation"><div class="icon-next"></div></div><div class="gallery-view-icon-prev"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJjdXJyZW50Q29sb3IiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIj48cGF0aCBkPSJtMTUgMTgtNi02IDYtNiI+PC9wYXRoPjwvc3ZnPg==" alt="navigation"><div class="icon-prev"></div></div></div><div class="gallery-controls"><div class="gallery-scroll full-height"><div class="gallery-controls-wrap"><div class="gallery-controls-item active " data-index="0"></div><div class="gallery-controls-item " data-index="1"></div><div class="gallery-controls-item " data-index="2"></div><div class="gallery-controls-item " data-index="3"></div><div class="gallery-controls-item " data-index="4"></div><div class="gallery-controls-item " data-index="5"></div><div class="gallery-controls-item " data-index="6"></div><div class="gallery-controls-item " data-index="7"></div><div class="gallery-controls-item " data-index="8"></div></div></div><div class="gallery-controls-icon-next"><img src="data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgNDAgNDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHBhdGggZD0iTTAgMjBDMCA4Ljk1NDMxIDguOTU0MzEgMCAyMCAwQzMxLjA0NTcgMCA0MCA4Ljk1NDMxIDQwIDIwQzQwIDMxLjA0NTcgMzEuMDQ1NyA0MCAyMCA0MEM4Ljk1NDMxIDQwIDAgMzEuMDQ1NyAwIDIwWiIgZmlsbD0id2hpdGUiLz48cGF0aCBkPSJNMjEuOTg0MSAxNC40ODQxQzIyLjI2ODggMTQuMTk5MyAyMi43MzEyIDE0LjE5OTMgMjMuMDE2IDE0LjQ4NDFDMjMuMzAwNyAxNC43Njg4IDIzLjMwMDcgMTUuMjMxMiAyMy4wMTYgMTUuNTE2TDE4LjUzMTkgMjBMMjMuMDE2IDI0LjQ4NDFDMjMuMzAwNyAyNC43Njg4IDIzLjMwMDcgMjUuMjMxMiAyMy4wMTYgMjUuNTE2QzIyLjczMTIgMjUuODAwNyAyMi4yNjg4IDI1LjgwMDcgMjEuOTg0MSAyNS41MTZMMTYuOTg0MSAyMC41MTZDMTYuNjk5MyAyMC4yMzEyIDE2LjY5OTMgMTkuNzY4OCAxNi45ODQxIDE5LjQ4NDFMMjEuOTg0MSAxNC40ODQxWiIgZmlsbD0iIzE3MTcxNyIvPjwvc3ZnPg==" alt="navigation" style="transform: rotate(180deg);"><div class="control-next"></div></div><div class="gallery-controls-icon-prev"><img src="data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgNDAgNDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHBhdGggZD0iTTAgMjBDMCA4Ljk1NDMxIDguOTU0MzEgMCAyMCAwQzMxLjA0NTcgMCA0MCA4Ljk1NDMxIDQwIDIwQzQwIDMxLjA0NTcgMzEuMDQ1NyA0MCAyMCA0MEM4Ljk1NDMxIDQwIDAgMzEuMDQ1NyAwIDIwWiIgZmlsbD0id2hpdGUiLz48cGF0aCBkPSJNMjEuOTg0MSAxNC40ODQxQzIyLjI2ODggMTQuMTk5MyAyMi43MzEyIDE0LjE5OTMgMjMuMDE2IDE0LjQ4NDFDMjMuMzAwNyAxNC43Njg4IDIzLjMwMDcgMTUuMjMxMiAyMy4wMTYgMTUuNTE2TDE4LjUzMTkgMjBMMjMuMDE2IDI0LjQ4NDFDMjMuMzAwNyAyNC43Njg4IDIzLjMwMDcgMjUuMjMxMiAyMy4wMTYgMjUuNTE2QzIyLjczMTIgMjUuODAwNyAyMi4yNjg4IDI1LjgwMDcgMjEuOTg0MSAyNS41MTZMMTYuOTg0MSAyMC41MTZDMTYuNjk5MyAyMC4yMzEyIDE2LjY5OTMgMTkuNzY4OCAxNi45ODQxIDE5LjQ4NDFMMjEuOTg0MSAxNC40ODQxWiIgZmlsbD0iIzE3MTcxNyIvPjwvc3ZnPg==" alt="navigation"><div class="control-prev"></div></div></div></div></div><div   id="w-r53peq4v" class="p-absolute group-auto-scroll sroll-size" ><div class="group-container"><div   id="w-tv6gj6rj" class="com-text-block p-absolute" ><div class="text-block"><h2 class="text-block-css full-width">CHI TIẾT SẢN PHẨM</h2></div></div><div   id="w-6gopfxv3" class="p-absolute" ><div class="line-css full-width horizontal-line"><div class="line-container"></div></div></div></div></div><div   id="w-tfbamtdg" class="com-text-block p-absolute" ><div class="text-block"><p class="text-block-css full-width">Thiết kế chắc chắn, kiểu dáng khỏe khoắn, đế có rãnh tăng độ bám, thân giày dễ vệ sinh. Phù hợp cho người lao động cần một đôi giày bảo hộ tiện dụng trong công việc hằng ngày.</p></div></div><div   id="w-8h8ntvif" class="com-image-block p-absolute" ><div class="image-block-css p-relative full-width full-height full-mask-size mask-position"><div class="image-background p-absolute " role="img" aria-label=""></div><div class="image-gradient-border"></div></div></div><div id="w-i5zkeukv" class="com-video p-absolute"><div class="video-css full-width full-height"><div class="video-wrapper full-width full-height p-relative"><video id="product_video" preload="metadata" playsinline webkit-playsinline controls poster="./images/anh_04_7f45ea5ceb6c362b272f468fa22da294d7127aff9fdf59930c48c7f2.jpg" src="./images/video_gioi_thieu_giay.mp4?v=20261117"><source src="./images/video_gioi_thieu_giay.mp4?v=20261117" type="video/mp4"><source src="https://statics.pancake.vn/web-media-264/19/03/2f/3b/dbdf96bbb796a96532a8445b50cccf3014048493f99b19815cfca12b-w:1080-h:1440-l:79120569-t:video/mp4.mp4" type="video/mp4"></video><div class="video-background p-absolute full-width full-height"></div><div class="icon-play-video"></div></div></div></div></div></div></div><div   id="w-ruomom6n" class="com-section"data-section ><div class="section-wrapper full-width full-height p-relative"><div class="section-background p-absolute full-width full-height "></div><div class="section-container full-height p-relative"><div   id="w-1dwu6rc9" class="p-absolute group-auto-scroll sroll-size" ><div class="group-container"><div   id="w-9uq8w857" class="com-text-block p-absolute" ><div class="text-block"><h2 class="text-block-css full-width">BẢNG GIÁ ƯU ĐÃI</h2></div></div><div   id="w-yevznv0t" class="p-absolute" ><div class="line-css full-width horizontal-line"><div class="line-container"></div></div></div></div></div><div   id="w-dxm0gd6k" class="com-text-block p-absolute" ><div class="text-block"><h1 class="text-block-css full-width">CHỌN ƯU ĐÃI PHÙ HỢP</h1></div></div><div   id="w-cpcdj4ym" class="p-absolute group-auto-scroll sroll-size" ><div class="group-container"><div   id="w-lu74u2wt" class="com-text-block p-absolute" ><div class="text-block"><h3 class="text-block-css full-width">4.9</h3></div></div><div   id="w-tp4lczph" class="p-absolute group-auto-scroll sroll-size" ><div class="group-container"><div   id="w-whxcon7p" class="com-rectangle p-absolute" ><div class="rectangle-css full-mask-size mask-position full-height full-width "><div class="rectangle-gradient-border"></div></div></div><div   id="w-0f85gd6n" class="com-rectangle p-absolute" ><div class="rectangle-css full-mask-size mask-position full-height full-width "><div class="rectangle-gradient-border"></div></div></div><div   id="w-7zzlh6ce" class="com-rectangle p-absolute" ><div class="rectangle-css full-mask-size mask-position full-height full-width "><div class="rectangle-gradient-border"></div></div></div><div   id="w-9vzq2zg7" class="com-rectangle p-absolute" ><div class="rectangle-css full-mask-size mask-position full-height full-width "><div class="rectangle-gradient-border"></div></div></div><div   id="w-pm0x87xy" class="com-rectangle p-absolute" ><div class="rectangle-css full-mask-size mask-position full-height full-width "><div class="rectangle-gradient-border"></div></div></div></div></div><div   id="w-h4x2cf1e" class="com-text-block p-absolute" ><div class="text-block"><h4 class="text-block-css full-width">(226 đánh giá)</h4></div></div><div   id="w-64ntr5bx" class="com-text-block p-absolute" ><div class="text-block"><h4 class="text-block-css full-width">455 lượt mua</h4></div></div><div   id="w-qu2nfajb" class="p-absolute" ><div class="full-width full-height"><div class="line-css full-width horizontal-line"><div class="line-container"></div></div></div></div><div   id="w-q5gawmkb" class="p-absolute" ><div class="full-width full-height"><div class="line-css full-width horizontal-line"><div class="line-container"></div></div></div></div><div id="w-0x26p1fp" class="p-absolute modern-product-price-bar"><div class="product-price-inner"><div class="product-price-left"><span class="product-deal-badge">GIẢM 40%</span><span class="product-orig-price">Giá gốc: <del>599.000đ</del></span></div><div class="product-price-right"><span class="product-curr-price">399.000</span><span class="product-curr-unit">vnđ/đôi</span></div></div></div><div   id="w-wiigvfia" class="p-absolute" ><div class="list-paragraph-container"><ul><li>Giao hàng tận nơi
+            ></div><div class="gallery-view-icon-next"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJjdXJyZW50Q29sb3IiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIj48cGF0aCBkPSJtOSAxOCA2LTYtNi02Ij48L3BhdGg+PC9zdmc+" alt="navigation"><div class="icon-next"></div></div><div class="gallery-view-icon-prev"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJjdXJyZW50Q29sb3IiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIj48cGF0aCBkPSJtMTUgMTgtNi02IDYtNiI+PC9wYXRoPjwvc3ZnPg==" alt="navigation"><div class="icon-prev"></div></div></div><div class="gallery-controls"><div class="gallery-scroll full-height"><div class="gallery-controls-wrap"><div class="gallery-controls-item active " data-index="0"></div><div class="gallery-controls-item " data-index="1"></div><div class="gallery-controls-item " data-index="2"></div><div class="gallery-controls-item " data-index="3"></div><div class="gallery-controls-item " data-index="4"></div><div class="gallery-controls-item " data-index="5"></div><div class="gallery-controls-item " data-index="6"></div><div class="gallery-controls-item " data-index="7"></div><div class="gallery-controls-item " data-index="8"></div></div></div><div class="gallery-controls-icon-next"><img src="data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgNDAgNDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHBhdGggZD0iTTAgMjBDMCA4Ljk1NDMxIDguOTU0MzEgMCAyMCAwQzMxLjA0NTcgMCA0MCA4Ljk1NDMxIDQwIDIwQzQwIDMxLjA0NTcgMzEuMDQ1NyA0MCAyMCA0MEM4Ljk1NDMxIDQwIDAgMzEuMDQ1NyAwIDIwWiIgZmlsbD0id2hpdGUiLz48cGF0aCBkPSJNMjEuOTg0MSAxNC40ODQxQzIyLjI2ODggMTQuMTk5MyAyMi43MzEyIDE0LjE5OTMgMjMuMDE2IDE0LjQ4NDFDMjMuMzAwNyAxNC43Njg4IDIzLjMwMDcgMTUuMjMxMiAyMy4wMTYgMTUuNTE2TDE4LjUzMTkgMjBMMjMuMDE2IDI0LjQ4NDFDMjMuMzAwNyAyNC43Njg4IDIzLjMwMDcgMjUuMjMxMiAyMy4wMTYgMjUuNTE2QzIyLjczMTIgMjUuODAwNyAyMi4yNjg4IDI1LjgwMDcgMjEuOTg0MSAyNS41MTZMMTYuOTg0MSAyMC41MTZDMTYuNjk5MyAyMC4yMzEyIDE2LjY5OTMgMTkuNzY4OCAxNi45ODQxIDE5LjQ4NDFMMjEuOTg0MSAxNC40ODQxWiIgZmlsbD0iIzE3MTcxNyIvPjwvc3ZnPg==" alt="navigation" style="transform: rotate(180deg);"><div class="control-next"></div></div><div class="gallery-controls-icon-prev"><img src="data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgNDAgNDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHBhdGggZD0iTTAgMjBDMCA4Ljk1NDMxIDguOTU0MzEgMCAyMCAwQzMxLjA0NTcgMCA0MCA4Ljk1NDMxIDQwIDIwQzQwIDMxLjA0NTcgMzEuMDQ1NyA0MCAyMCA0MEM4Ljk1NDMxIDQwIDAgMzEuMDQ1NyAwIDIwWiIgZmlsbD0id2hpdGUiLz48cGF0aCBkPSJNMjEuOTg0MSAxNC40ODQxQzIyLjI2ODggMTQuMTk5MyAyMi43MzEyIDE0LjE5OTMgMjMuMDE2IDE0LjQ4NDFDMjMuMzAwNyAxNC43Njg4IDIzLjMwMDcgMTUuMjMxMiAyMy4wMTYgMTUuNTE2TDE4LjUzMTkgMjBMMjMuMDE2IDI0LjQ4NDFDMjMuMzAwNyAyNC43Njg4IDIzLjMwMDcgMjUuMjMxMiAyMy4wMTYgMjUuNTE2QzIyLjczMTIgMjUuODAwNyAyMi4yNjg4IDI1LjgwMDcgMjEuOTg0MSAyNS41MTZMMTYuOTg0MSAyMC41MTZDMTYuNjk5MyAyMC4yMzEyIDE2LjY5OTMgMTkuNzY4OCAxNi45ODQxIDE5LjQ4NDFMMjEuOTg0MSAxNC40ODQxWiIgZmlsbD0iIzE3MTcxNyIvPjwvc3ZnPg==" alt="navigation"><div class="control-prev"></div></div></div></div></div><div   id="w-r53peq4v" class="p-absolute group-auto-scroll sroll-size" ><div class="group-container"><div   id="w-tv6gj6rj" class="com-text-block p-absolute" ><div class="text-block"><h2 class="text-block-css full-width">CHI TIẾT SẢN PHẨM</h2></div></div><div   id="w-6gopfxv3" class="p-absolute" ><div class="line-css full-width horizontal-line"><div class="line-container"></div></div></div></div></div><div   id="w-tfbamtdg" class="com-text-block p-absolute" ><div class="text-block"><p class="text-block-css full-width">Thiết kế chắc chắn, kiểu dáng khỏe khoắn, đế có rãnh tăng độ bám, thân giày dễ vệ sinh. Phù hợp cho người lao động cần một đôi giày bảo hộ tiện dụng trong công việc hằng ngày.</p></div></div><div   id="w-8h8ntvif" class="com-image-block p-absolute" ><div class="image-block-css p-relative full-width full-height full-mask-size mask-position"><div class="image-background p-absolute " role="img" aria-label=""></div><div class="image-gradient-border"></div></div></div><div id="w-i5zkeukv" class="com-video p-absolute"><div class="video-css full-width full-height"><div class="video-wrapper full-width full-height p-relative"><video id="product_video" preload="metadata" playsinline webkit-playsinline controls poster="./images/anh_04_7f45ea5ceb6c362b272f468fa22da294d7127aff9fdf59930c48c7f2.jpg" src="./images/video_gioi_thieu_giay.mp4?v=20261117"><source src="./images/video_gioi_thieu_giay.mp4?v=20261117" type="video/mp4"><source src="https://statics.pancake.vn/web-media-264/19/03/2f/3b/dbdf96bbb796a96532a8445b50cccf3014048493f99b19815cfca12b-w:1080-h:1440-l:79120569-t:video/mp4.mp4" type="video/mp4"></video><div class="video-background p-absolute full-width full-height"></div><div class="icon-play-video"></div></div></div></div></div></div></div><div   id="w-ruomom6n" class="com-section"data-section ><div class="section-wrapper full-width full-height p-relative"><div class="section-background p-absolute full-width full-height "></div><div class="section-container full-height p-relative"><div   id="w-1dwu6rc9" class="p-absolute group-auto-scroll sroll-size" ><div class="group-container"><div   id="w-9uq8w857" class="com-text-block p-absolute" ><div class="text-block"><h2 class="text-block-css full-width">BẢNG GIÁ ƯU ĐÃI</h2></div></div><div   id="w-yevznv0t" class="p-absolute" ><div class="line-css full-width horizontal-line"><div class="line-container"></div></div></div></div></div><div   id="w-dxm0gd6k" class="com-text-block p-absolute" ><div class="text-block"><h1 class="text-block-css full-width">CHỌN ƯU ĐÃI PHÙ HỢP</h1></div></div><div   id="w-cpcdj4ym" class="p-absolute group-auto-scroll sroll-size" ><div class="group-container"><div   id="w-lu74u2wt" class="com-text-block p-absolute" ><div class="text-block"><h3 class="text-block-css full-width">4.9</h3></div></div><div   id="w-tp4lczph" class="p-absolute group-auto-scroll sroll-size" ><div class="group-container"><div   id="w-whxcon7p" class="com-rectangle p-absolute" ><div class="rectangle-css full-mask-size mask-position full-height full-width "><div class="rectangle-gradient-border"></div></div></div><div   id="w-0f85gd6n" class="com-rectangle p-absolute" ><div class="rectangle-css full-mask-size mask-position full-height full-width "><div class="rectangle-gradient-border"></div></div></div><div   id="w-7zzlh6ce" class="com-rectangle p-absolute" ><div class="rectangle-css full-mask-size mask-position full-height full-width "><div class="rectangle-gradient-border"></div></div></div><div   id="w-9vzq2zg7" class="com-rectangle p-absolute" ><div class="rectangle-css full-mask-size mask-position full-height full-width "><div class="rectangle-gradient-border"></div></div></div><div   id="w-pm0x87xy" class="com-rectangle p-absolute" ><div class="rectangle-css full-mask-size mask-position full-height full-width "><div class="rectangle-gradient-border"></div></div></div></div></div><div   id="w-h4x2cf1e" class="com-text-block p-absolute" ><div class="text-block"><h4 class="text-block-css full-width">(226 đánh giá)</h4></div></div><div   id="w-64ntr5bx" class="com-text-block p-absolute" ><div class="text-block"><h4 class="text-block-css full-width">455 lượt mua</h4></div></div><div   id="w-qu2nfajb" class="p-absolute" ><div class="full-width full-height"><div class="line-css full-width horizontal-line"><div class="line-container"></div></div></div></div><div   id="w-q5gawmkb" class="p-absolute" ><div class="full-width full-height"><div class="line-css full-width horizontal-line"><div class="line-container"></div></div></div></div><div id="w-0x26p1fp" class="p-absolute product-price-bar-custom"><div class="price-bar-content"><span class="price-label">Giá:</span><span class="price-amount">399.000 vnđ/đôi</span></div></div><div   id="w-wiigvfia" class="p-absolute" ><div class="list-paragraph-container"><ul><li>Giao hàng tận nơi
 </li><li>Được kiểm tra hàng trước khi thanh toán
 </li><li>Đổi trả trong vòng 7 ngày</li><li>Thời gian giao hàng 3-5 ngày
 </li><li>Hình thật 100%</li></ul></div></div><div   id="w-o8dgu8wb" class="p-absolute group-auto-scroll sroll-size" ><div class="group-container"><div   id="w-ji8y62ft" class="com-text-block p-absolute" ><div class="text-block"><h3 class="text-block-css full-width">Bảo hành<br>6 tháng</h3></div></div><div   id="w-0rn006xf" class="com-text-block p-absolute" ><div class="text-block"><h3 class="text-block-css full-width">Miễn phí giao hàng toàn quốc<br></h3></div></div><div   id="w-gmhfphcx" class="com-rectangle p-absolute" ><div class="rectangle-css full-mask-size mask-position full-height full-width "><div class="rectangle-gradient-border"></div></div></div><div   id="w-ih79mrb2" class="p-absolute" ><div class="line-css full-width horizontal-line"><div class="line-container"></div></div></div><div   id="w-l6sandyl" class="p-absolute" ><div class="line-css full-width horizontal-line"><div class="line-container"></div></div></div></div></div><div   id="w-obo86yur" class="com-button p-absolute" ><div class="button-css full-height full-width "><span class="button-loader"></span><div class="button-text u-select-none">ĐẶT HÀNG NGAY</div><div class="gradient-border-el"></div></div></div><div   id="w-vjkt4lq6" class="com-button p-absolute" ><div class="button-css full-height full-width "><span class="button-loader"></span><div class="button-text u-select-none">BẢNG SIZE</div><div class="gradient-border-el"></div></div></div><div   id="w-rbvw16gd" class="com-text-block p-absolute" ><div class="text-block"><h3 class="text-block-css full-width">Giày Safety Cổ Cao</h3></div></div><div   id="w-06l13rlx" class="com-gallery p-absolute" ><div class="gallery-wrapper full-width full-height p-absolute"><div class="gallery-view p-absolute"><div 
@@ -294,7 +316,7 @@ fbq("init", "1441661348054461", {external_id: window.pixel_external_id});;
               class="gallery-view-item p-absolute " 
               data-index="2"   
               role="img" aria-label=""
-            ></div><div class="gallery-view-icon-next"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJjdXJyZW50Q29sb3IiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIj48cGF0aCBkPSJtOSAxOCA2LTYtNi02Ij48L3BhdGg+PC9zdmc+" alt="navigation"><div class="icon-next"></div></div><div class="gallery-view-icon-prev"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJjdXJyZW50Q29sb3IiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIj48cGF0aCBkPSJtMTUgMTgtNi02IDYtNiI+PC9wYXRoPjwvc3ZnPg==" alt="navigation"><div class="icon-prev"></div></div></div><div class="gallery-controls"><div class="gallery-scroll full-height"><div class="gallery-controls-wrap"><div class="gallery-controls-item active " data-index="0"></div><div class="gallery-controls-item " data-index="1"></div><div class="gallery-controls-item " data-index="2"></div></div></div><div class="gallery-controls-icon-next"><img src="data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgNDAgNDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHBhdGggZD0iTTAgMjBDMCA4Ljk1NDMxIDguOTU0MzEgMCAyMCAwQzMxLjA0NTcgMCA0MCA4Ljk1NDMxIDQwIDIwQzQwIDMxLjA0NTcgMzEuMDQ1NyA0MCAyMCA0MEM4Ljk1NDMxIDQwIDAgMzEuMDQ1NyAwIDIwWiIgZmlsbD0id2hpdGUiLz48cGF0aCBkPSJNMjEuOTg0MSAxNC40ODQxQzIyLjI2ODggMTQuMTk5MyAyMi43MzEyIDE0LjE5OTMgMjMuMDE2IDE0LjQ4NDFDMjMuMzAwNyAxNC43Njg4IDIzLjMwMDcgMTUuMjMxMiAyMy4wMTYgMTUuNTE2TDE4LjUzMTkgMjBMMjMuMDE2IDI0LjQ4NDFDMjMuMzAwNyAyNC43Njg4IDIzLjMwMDcgMjUuMjMxMiAyMy4wMTYgMjUuNTE2QzIyLjczMTIgMjUuODAwNyAyMi4yNjg4IDI1LjgwMDcgMjEuOTg0MSAyNS41MTZMMTYuOTg0MSAyMC41MTZDMTYuNjk5MyAyMC4yMzEyIDE2LjY5OTMgMTkuNzY4OCAxNi45ODQxIDE5LjQ4NDFMMjEuOTg0MSAxNC40ODQxWiIgZmlsbD0iIzE3MTcxNyIvPjwvc3ZnPg==" alt="navigation" style="transform: rotate(180deg);"><div class="control-next"></div></div><div class="gallery-controls-icon-prev"><img src="data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgNDAgNDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHBhdGggZD0iTTAgMjBDMCA4Ljk1NDMxIDguOTU0MzEgMCAyMCAwQzMxLjA0NTcgMCA0MCA4Ljk1NDMxIDQwIDIwQzQwIDMxLjA0NTcgMzEuMDQ1NyA0MCAyMCA0MEM4Ljk1NDMxIDQwIDAgMzEuMDQ1NyAwIDIwWiIgZmlsbD0id2hpdGUiLz48cGF0aCBkPSJNMjEuOTg0MSAxNC40ODQxQzIyLjI2ODggMTQuMTk5MyAyMi43MzEyIDE0LjE5OTMgMjMuMDE2IDE0LjQ4NDFDMjMuMzAwNyAxNC43Njg4IDIzLjMwMDcgMTUuMjMxMiAyMy4wMTYgMTUuNTE2TDE4LjUzMTkgMjBMMjMuMDE2IDI0LjQ4NDFDMjMuMzAwNyAyNC43Njg4IDIzLjMwMDcgMjUuMjMxMiAyMy4wMTYgMjUuNTE2QzIyLjczMTIgMjUuODAwNyAyMi4yNjg4IDI1LjgwMDcgMjEuOTg0MSAyNS41MTZMMTYuOTg0MSAyMC41MTZDMTYuNjk5MyAyMC4yMzEyIDE2LjY5OTMgMTkuNzY4OCAxNi45ODQxIDE5LjQ4NDFMMjEuOTg0MSAxNC40ODQxWiIgZmlsbD0iIzE3MTcxNyIvPjwvc3ZnPg==" alt="navigation"><div class="control-prev"></div></div></div></div></div></div></div></div></div></div><div   id="w-q4j4uyjl" class="com-section"data-section ><div class="section-wrapper full-width full-height p-relative"><div class="section-background p-absolute full-width full-height "></div><div class="section-container full-height p-relative"><div   id="w-lzvn5vyk" class="p-absolute group-auto-scroll sroll-size" ><div class="group-container"><div   id="w-wniob6q5" class="com-text-block p-absolute" ><div class="text-block"><h3 class="text-block-css full-width">4.9</h3></div></div><div   id="w-y8304uw1" class="p-absolute group-auto-scroll sroll-size" ><div class="group-container"><div   id="w-9kuf3ehc" class="com-rectangle p-absolute" ><div class="rectangle-css full-mask-size mask-position full-height full-width "><div class="rectangle-gradient-border"></div></div></div><div   id="w-2gsk7pcr" class="com-rectangle p-absolute" ><div class="rectangle-css full-mask-size mask-position full-height full-width "><div class="rectangle-gradient-border"></div></div></div><div   id="w-5zbwtobq" class="com-rectangle p-absolute" ><div class="rectangle-css full-mask-size mask-position full-height full-width "><div class="rectangle-gradient-border"></div></div></div><div   id="w-654rc8sn" class="com-rectangle p-absolute" ><div class="rectangle-css full-mask-size mask-position full-height full-width "><div class="rectangle-gradient-border"></div></div></div><div   id="w-s8ye3iol" class="com-rectangle p-absolute" ><div class="rectangle-css full-mask-size mask-position full-height full-width "><div class="rectangle-gradient-border"></div></div></div></div></div><div   id="w-phlzsb2l" class="com-text-block p-absolute" ><div class="text-block"><h4 class="text-block-css full-width">(163 đánh giá)</h4></div></div><div   id="w-kcj1q9zl" class="com-text-block p-absolute" ><div class="text-block"><h4 class="text-block-css full-width">385 lượt mua</h4></div></div><div   id="w-8rcvkq7o" class="p-absolute" ><div class="full-width full-height"><div class="line-css full-width horizontal-line"><div class="line-container"></div></div></div></div><div   id="w-lcbml4c4" class="p-absolute" ><div class="full-width full-height"><div class="line-css full-width horizontal-line"><div class="line-container"></div></div></div></div><div id="w-d1yhd4gu" class="p-absolute modern-product-price-bar"><div class="product-price-inner"><div class="product-price-left"><span class="product-deal-badge">GIẢM 40%</span><span class="product-orig-price">Giá gốc: <del>549.000đ</del></span></div><div class="product-price-right"><span class="product-curr-price">329.000</span><span class="product-curr-unit">vnđ/đôi</span></div></div></div><div   id="w-hcjx3m92" class="p-absolute" ><div class="list-paragraph-container"><ul><li>Giao hàng tận nơi
+            ></div><div class="gallery-view-icon-next"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJjdXJyZW50Q29sb3IiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIj48cGF0aCBkPSJtOSAxOCA2LTYtNi02Ij48L3BhdGg+PC9zdmc+" alt="navigation"><div class="icon-next"></div></div><div class="gallery-view-icon-prev"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJjdXJyZW50Q29sb3IiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIj48cGF0aCBkPSJtMTUgMTgtNi02IDYtNiI+PC9wYXRoPjwvc3ZnPg==" alt="navigation"><div class="icon-prev"></div></div></div><div class="gallery-controls"><div class="gallery-scroll full-height"><div class="gallery-controls-wrap"><div class="gallery-controls-item active " data-index="0"></div><div class="gallery-controls-item " data-index="1"></div><div class="gallery-controls-item " data-index="2"></div></div></div><div class="gallery-controls-icon-next"><img src="data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgNDAgNDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHBhdGggZD0iTTAgMjBDMCA4Ljk1NDMxIDguOTU0MzEgMCAyMCAwQzMxLjA0NTcgMCA0MCA4Ljk1NDMxIDQwIDIwQzQwIDMxLjA0NTcgMzEuMDQ1NyA0MCAyMCA0MEM4Ljk1NDMxIDQwIDAgMzEuMDQ1NyAwIDIwWiIgZmlsbD0id2hpdGUiLz48cGF0aCBkPSJNMjEuOTg0MSAxNC40ODQxQzIyLjI2ODggMTQuMTk5MyAyMi43MzEyIDE0LjE5OTMgMjMuMDE2IDE0LjQ4NDFDMjMuMzAwNyAxNC43Njg4IDIzLjMwMDcgMTUuMjMxMiAyMy4wMTYgMTUuNTE2TDE4LjUzMTkgMjBMMjMuMDE2IDI0LjQ4NDFDMjMuMzAwNyAyNC43Njg4IDIzLjMwMDcgMjUuMjMxMiAyMy4wMTYgMjUuNTE2QzIyLjczMTIgMjUuODAwNyAyMi4yNjg4IDI1LjgwMDcgMjEuOTg0MSAyNS41MTZMMTYuOTg0MSAyMC41MTZDMTYuNjk5MyAyMC4yMzEyIDE2LjY5OTMgMTkuNzY4OCAxNi45ODQxIDE5LjQ4NDFMMjEuOTg0MSAxNC40ODQxWiIgZmlsbD0iIzE3MTcxNyIvPjwvc3ZnPg==" alt="navigation" style="transform: rotate(180deg);"><div class="control-next"></div></div><div class="gallery-controls-icon-prev"><img src="data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgNDAgNDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHBhdGggZD0iTTAgMjBDMCA4Ljk1NDMxIDguOTU0MzEgMCAyMCAwQzMxLjA0NTcgMCA0MCA4Ljk1NDMxIDQwIDIwQzQwIDMxLjA0NTcgMzEuMDQ1NyA0MCAyMCA0MEM4Ljk1NDMxIDQwIDAgMzEuMDQ1NyAwIDIwWiIgZmlsbD0id2hpdGUiLz48cGF0aCBkPSJNMjEuOTg0MSAxNC40ODQxQzIyLjI2ODggMTQuMTk5MyAyMi43MzEyIDE0LjE5OTMgMjMuMDE2IDE0LjQ4NDFDMjMuMzAwNyAxNC43Njg4IDIzLjMwMDcgMTUuMjMxMiAyMy4wMTYgMTUuNTE2TDE4LjUzMTkgMjBMMjMuMDE2IDI0LjQ4NDFDMjMuMzAwNyAyNC43Njg4IDIzLjMwMDcgMjUuMjMxMiAyMy4wMTYgMjUuNTE2QzIyLjczMTIgMjUuODAwNyAyMi4yNjg4IDI1LjgwMDcgMjEuOTg0MSAyNS41MTZMMTYuOTg0MSAyMC41MTZDMTYuNjk5MyAyMC4yMzEyIDE2LjY5OTMgMTkuNzY4OCAxNi45ODQxIDE5LjQ4NDFMMjEuOTg0MSAxNC40ODQxWiIgZmlsbD0iIzE3MTcxNyIvPjwvc3ZnPg==" alt="navigation"><div class="control-prev"></div></div></div></div></div></div></div></div></div></div><div   id="w-q4j4uyjl" class="com-section"data-section ><div class="section-wrapper full-width full-height p-relative"><div class="section-background p-absolute full-width full-height "></div><div class="section-container full-height p-relative"><div   id="w-lzvn5vyk" class="p-absolute group-auto-scroll sroll-size" ><div class="group-container"><div   id="w-wniob6q5" class="com-text-block p-absolute" ><div class="text-block"><h3 class="text-block-css full-width">4.9</h3></div></div><div   id="w-y8304uw1" class="p-absolute group-auto-scroll sroll-size" ><div class="group-container"><div   id="w-9kuf3ehc" class="com-rectangle p-absolute" ><div class="rectangle-css full-mask-size mask-position full-height full-width "><div class="rectangle-gradient-border"></div></div></div><div   id="w-2gsk7pcr" class="com-rectangle p-absolute" ><div class="rectangle-css full-mask-size mask-position full-height full-width "><div class="rectangle-gradient-border"></div></div></div><div   id="w-5zbwtobq" class="com-rectangle p-absolute" ><div class="rectangle-css full-mask-size mask-position full-height full-width "><div class="rectangle-gradient-border"></div></div></div><div   id="w-654rc8sn" class="com-rectangle p-absolute" ><div class="rectangle-css full-mask-size mask-position full-height full-width "><div class="rectangle-gradient-border"></div></div></div><div   id="w-s8ye3iol" class="com-rectangle p-absolute" ><div class="rectangle-css full-mask-size mask-position full-height full-width "><div class="rectangle-gradient-border"></div></div></div></div></div><div   id="w-phlzsb2l" class="com-text-block p-absolute" ><div class="text-block"><h4 class="text-block-css full-width">(163 đánh giá)</h4></div></div><div   id="w-kcj1q9zl" class="com-text-block p-absolute" ><div class="text-block"><h4 class="text-block-css full-width">385 lượt mua</h4></div></div><div   id="w-8rcvkq7o" class="p-absolute" ><div class="full-width full-height"><div class="line-css full-width horizontal-line"><div class="line-container"></div></div></div></div><div   id="w-lcbml4c4" class="p-absolute" ><div class="full-width full-height"><div class="line-css full-width horizontal-line"><div class="line-container"></div></div></div></div><div id="w-d1yhd4gu" class="p-absolute product-price-bar-custom"><div class="price-bar-content"><span class="price-label">Giá:</span><span class="price-amount">329.000 vnđ/đôi</span></div></div><div   id="w-hcjx3m92" class="p-absolute" ><div class="list-paragraph-container"><ul><li>Giao hàng tận nơi
 </li><li>Được kiểm tra hàng trước khi thanh toán
 </li><li>Đổi trả trong vòng 7 ngày</li><li>Thời gian giao hàng 3-5 ngày
 </li><li>Hình thật 100%</li></ul></div></div><div   id="w-0m27kliv" class="p-absolute group-auto-scroll sroll-size" ><div class="group-container"><div   id="w-gut11frs" class="com-text-block p-absolute" ><div class="text-block"><h3 class="text-block-css full-width">Bảo hành<br>6 tháng</h3></div></div><div   id="w-8yrdr6t7" class="com-text-block p-absolute" ><div class="text-block"><h3 class="text-block-css full-width">Miễn phí giao hàng toàn quốc<br></h3></div></div><div   id="w-4yvz05eb" class="com-rectangle p-absolute" ><div class="rectangle-css full-mask-size mask-position full-height full-width "><div class="rectangle-gradient-border"></div></div></div><div   id="w-wk3eri2v" class="p-absolute" ><div class="line-css full-width horizontal-line"><div class="line-container"></div></div></div><div   id="w-e9a9jzqm" class="p-absolute" ><div class="line-css full-width horizontal-line"><div class="line-container"></div></div></div></div></div><div   id="w-h7mszx8q" class="com-button p-absolute" ><div class="button-css full-height full-width "><span class="button-loader"></span><div class="button-text u-select-none">ĐẶT HÀNG NGAY</div><div class="gradient-border-el"></div></div></div><div   id="w-ixbpra5h" class="com-button p-absolute" ><div class="button-css full-height full-width "><span class="button-loader"></span><div class="button-text u-select-none">BẢNG SIZE</div><div class="gradient-border-el"></div></div></div><div   id="w-xm8o1btj" class="com-text-block p-absolute" ><div class="text-block"><h3 class="text-block-css full-width">Giày Safety Cổ Thấp</h3></div></div><div   id="w-e9haiyi6" class="com-gallery p-absolute" ><div class="gallery-wrapper full-width full-height p-absolute"><div class="gallery-view p-absolute"><div 
@@ -309,7 +331,7 @@ fbq("init", "1441661348054461", {external_id: window.pixel_external_id});;
               class="gallery-view-item p-absolute " 
               data-index="2"   
               role="img" aria-label=""
-            ></div><div class="gallery-view-icon-next"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJjdXJyZW50Q29sb3IiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIj48cGF0aCBkPSJtOSAxOCA2LTYtNi02Ij48L3BhdGg+PC9zdmc+" alt="navigation"><div class="icon-next"></div></div><div class="gallery-view-icon-prev"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJjdXJyZW50Q29sb3IiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIj48cGF0aCBkPSJtMTUgMTgtNi02IDYtNiI+PC9wYXRoPjwvc3ZnPg==" alt="navigation"><div class="icon-prev"></div></div></div><div class="gallery-controls"><div class="gallery-scroll full-height"><div class="gallery-controls-wrap"><div class="gallery-controls-item active " data-index="0"></div><div class="gallery-controls-item " data-index="1"></div><div class="gallery-controls-item " data-index="2"></div></div></div><div class="gallery-controls-icon-next"><img src="data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgNDAgNDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHBhdGggZD0iTTAgMjBDMCA4Ljk1NDMxIDguOTU0MzEgMCAyMCAwQzMxLjA0NTcgMCA0MCA4Ljk1NDMxIDQwIDIwQzQwIDMxLjA0NTcgMzEuMDQ1NyA0MCAyMCA0MEM4Ljk1NDMxIDQwIDAgMzEuMDQ1NyAwIDIwWiIgZmlsbD0id2hpdGUiLz48cGF0aCBkPSJNMjEuOTg0MSAxNC40ODQxQzIyLjI2ODggMTQuMTk5MyAyMi43MzEyIDE0LjE5OTMgMjMuMDE2IDE0LjQ4NDFDMjMuMzAwNyAxNC43Njg4IDIzLjMwMDcgMTUuMjMxMiAyMy4wMTYgMTUuNTE2TDE4LjUzMTkgMjBMMjMuMDE2IDI0LjQ4NDFDMjMuMzAwNyAyNC43Njg4IDIzLjMwMDcgMjUuMjMxMiAyMy4wMTYgMjUuNTE2QzIyLjczMTIgMjUuODAwNyAyMi4yNjg4IDI1LjgwMDcgMjEuOTg0MSAyNS41MTZMMTYuOTg0MSAyMC41MTZDMTYuNjk5MyAyMC4yMzEyIDE2LjY5OTMgMTkuNzY4OCAxNi45ODQxIDE5LjQ4NDFMMjEuOTg0MSAxNC40ODQxWiIgZmlsbD0iIzE3MTcxNyIvPjwvc3ZnPg==" alt="navigation" style="transform: rotate(180deg);"><div class="control-next"></div></div><div class="gallery-controls-icon-prev"><img src="data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgNDAgNDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHBhdGggZD0iTTAgMjBDMCA4Ljk1NDMxIDguOTU0MzEgMCAyMCAwQzMxLjA0NTcgMCA0MCA4Ljk1NDMxIDQwIDIwQzQwIDMxLjA0NTcgMzEuMDQ1NyA0MCAyMCA0MEM4Ljk1NDMxIDQwIDAgMzEuMDQ1NyAwIDIwWiIgZmlsbD0id2hpdGUiLz48cGF0aCBkPSJNMjEuOTg0MSAxNC40ODQxQzIyLjI2ODggMTQuMTk5MyAyMi43MzEyIDE0LjE5OTMgMjMuMDE2IDE0LjQ4NDFDMjMuMzAwNyAxNC43Njg4IDIzLjMwMDcgMTUuMjMxMiAyMy4wMTYgMTUuNTE2TDE4LjUzMTkgMjBMMjMuMDE2IDI0LjQ4NDFDMjMuMzAwNyAyNC43Njg4IDIzLjMwMDcgMjUuMjMxMiAyMy4wMTYgMjUuNTE2QzIyLjczMTIgMjUuODAwNyAyMi4yNjg4IDI1LjgwMDcgMjEuOTg0MSAyNS41MTZMMTYuOTg0MSAyMC41MTZDMTYuNjk5MyAyMC4yMzEyIDE2LjY5OTMgMTkuNzY4OCAxNi45ODQxIDE5LjQ4NDFMMjEuOTg0MSAxNC40ODQxWiIgZmlsbD0iIzE3MTcxNyIvPjwvc3ZnPg==" alt="navigation"><div class="control-prev"></div></div></div></div></div></div></div><div   id="w-yrg3bqm7" class="p-absolute group-auto-scroll sroll-size" ><div class="group-container"><div   id="w-rjkxwr3q" class="com-text-block p-absolute" ><div class="text-block"><h3 class="text-block-css full-width">4.9</h3></div></div><div   id="w-0q2wbbms" class="p-absolute group-auto-scroll sroll-size" ><div class="group-container"><div   id="w-jkut1krf" class="com-rectangle p-absolute" ><div class="rectangle-css full-mask-size mask-position full-height full-width "><div class="rectangle-gradient-border"></div></div></div><div   id="w-lc8l7cy6" class="com-rectangle p-absolute" ><div class="rectangle-css full-mask-size mask-position full-height full-width "><div class="rectangle-gradient-border"></div></div></div><div   id="w-2zqvgz3j" class="com-rectangle p-absolute" ><div class="rectangle-css full-mask-size mask-position full-height full-width "><div class="rectangle-gradient-border"></div></div></div><div   id="w-27y9cfd7" class="com-rectangle p-absolute" ><div class="rectangle-css full-mask-size mask-position full-height full-width "><div class="rectangle-gradient-border"></div></div></div><div   id="w-j4iekbss" class="com-rectangle p-absolute" ><div class="rectangle-css full-mask-size mask-position full-height full-width "><div class="rectangle-gradient-border"></div></div></div></div></div><div   id="w-0io0loz8" class="com-text-block p-absolute" ><div class="text-block"><h4 class="text-block-css full-width">(263 đánh giá)</h4></div></div><div   id="w-kymgp7jk" class="com-text-block p-absolute" ><div class="text-block"><h4 class="text-block-css full-width">713 lượt mua</h4></div></div><div   id="w-0b4fei3j" class="p-absolute" ><div class="full-width full-height"><div class="line-css full-width horizontal-line"><div class="line-container"></div></div></div></div><div   id="w-m5jrd3qq" class="p-absolute" ><div class="full-width full-height"><div class="line-css full-width horizontal-line"><div class="line-container"></div></div></div></div><div id="w-ovd74i9c" class="p-absolute modern-product-price-bar"><div class="product-price-inner"><div class="product-price-left"><span class="product-deal-badge">GIẢM 40%</span><span class="product-orig-price">Giá gốc: <del>549.000đ</del></span></div><div class="product-price-right"><span class="product-curr-price">329.000</span><span class="product-curr-unit">vnđ/đôi</span></div></div></div><div   id="w-lpygqz00" class="p-absolute" ><div class="list-paragraph-container"><ul><li>Giao hàng tận nơi
+            ></div><div class="gallery-view-icon-next"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJjdXJyZW50Q29sb3IiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIj48cGF0aCBkPSJtOSAxOCA2LTYtNi02Ij48L3BhdGg+PC9zdmc+" alt="navigation"><div class="icon-next"></div></div><div class="gallery-view-icon-prev"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJjdXJyZW50Q29sb3IiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIj48cGF0aCBkPSJtMTUgMTgtNi02IDYtNiI+PC9wYXRoPjwvc3ZnPg==" alt="navigation"><div class="icon-prev"></div></div></div><div class="gallery-controls"><div class="gallery-scroll full-height"><div class="gallery-controls-wrap"><div class="gallery-controls-item active " data-index="0"></div><div class="gallery-controls-item " data-index="1"></div><div class="gallery-controls-item " data-index="2"></div></div></div><div class="gallery-controls-icon-next"><img src="data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgNDAgNDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHBhdGggZD0iTTAgMjBDMCA4Ljk1NDMxIDguOTU0MzEgMCAyMCAwQzMxLjA0NTcgMCA0MCA4Ljk1NDMxIDQwIDIwQzQwIDMxLjA0NTcgMzEuMDQ1NyA0MCAyMCA0MEM4Ljk1NDMxIDQwIDAgMzEuMDQ1NyAwIDIwWiIgZmlsbD0id2hpdGUiLz48cGF0aCBkPSJNMjEuOTg0MSAxNC40ODQxQzIyLjI2ODggMTQuMTk5MyAyMi43MzEyIDE0LjE5OTMgMjMuMDE2IDE0LjQ4NDFDMjMuMzAwNyAxNC43Njg4IDIzLjMwMDcgMTUuMjMxMiAyMy4wMTYgMTUuNTE2TDE4LjUzMTkgMjBMMjMuMDE2IDI0LjQ4NDFDMjMuMzAwNyAyNC43Njg4IDIzLjMwMDcgMjUuMjMxMiAyMy4wMTYgMjUuNTE2QzIyLjczMTIgMjUuODAwNyAyMi4yNjg4IDI1LjgwMDcgMjEuOTg0MSAyNS41MTZMMTYuOTg0MSAyMC41MTZDMTYuNjk5MyAyMC4yMzEyIDE2LjY5OTMgMTkuNzY4OCAxNi45ODQxIDE5LjQ4NDFMMjEuOTg0MSAxNC40ODQxWiIgZmlsbD0iIzE3MTcxNyIvPjwvc3ZnPg==" alt="navigation" style="transform: rotate(180deg);"><div class="control-next"></div></div><div class="gallery-controls-icon-prev"><img src="data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgNDAgNDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHBhdGggZD0iTTAgMjBDMCA4Ljk1NDMxIDguOTU0MzEgMCAyMCAwQzMxLjA0NTcgMCA0MCA4Ljk1NDMxIDQwIDIwQzQwIDMxLjA0NTcgMzEuMDQ1NyA0MCAyMCA0MEM4Ljk1NDMxIDQwIDAgMzEuMDQ1NyAwIDIwWiIgZmlsbD0id2hpdGUiLz48cGF0aCBkPSJNMjEuOTg0MSAxNC40ODQxQzIyLjI2ODggMTQuMTk5MyAyMi43MzEyIDE0LjE5OTMgMjMuMDE2IDE0LjQ4NDFDMjMuMzAwNyAxNC43Njg4IDIzLjMwMDcgMTUuMjMxMiAyMy4wMTYgMTUuNTE2TDE4LjUzMTkgMjBMMjMuMDE2IDI0LjQ4NDFDMjMuMzAwNyAyNC43Njg4IDIzLjMwMDcgMjUuMjMxMiAyMy4wMTYgMjUuNTE2QzIyLjczMTIgMjUuODAwNyAyMi4yNjg4IDI1LjgwMDcgMjEuOTg0MSAyNS41MTZMMTYuOTg0MSAyMC41MTZDMTYuNjk5MyAyMC4yMzEyIDE2LjY5OTMgMTkuNzY4OCAxNi45ODQxIDE5LjQ4NDFMMjEuOTg0MSAxNC40ODQxWiIgZmlsbD0iIzE3MTcxNyIvPjwvc3ZnPg==" alt="navigation"><div class="control-prev"></div></div></div></div></div></div></div><div   id="w-yrg3bqm7" class="p-absolute group-auto-scroll sroll-size" ><div class="group-container"><div   id="w-rjkxwr3q" class="com-text-block p-absolute" ><div class="text-block"><h3 class="text-block-css full-width">4.9</h3></div></div><div   id="w-0q2wbbms" class="p-absolute group-auto-scroll sroll-size" ><div class="group-container"><div   id="w-jkut1krf" class="com-rectangle p-absolute" ><div class="rectangle-css full-mask-size mask-position full-height full-width "><div class="rectangle-gradient-border"></div></div></div><div   id="w-lc8l7cy6" class="com-rectangle p-absolute" ><div class="rectangle-css full-mask-size mask-position full-height full-width "><div class="rectangle-gradient-border"></div></div></div><div   id="w-2zqvgz3j" class="com-rectangle p-absolute" ><div class="rectangle-css full-mask-size mask-position full-height full-width "><div class="rectangle-gradient-border"></div></div></div><div   id="w-27y9cfd7" class="com-rectangle p-absolute" ><div class="rectangle-css full-mask-size mask-position full-height full-width "><div class="rectangle-gradient-border"></div></div></div><div   id="w-j4iekbss" class="com-rectangle p-absolute" ><div class="rectangle-css full-mask-size mask-position full-height full-width "><div class="rectangle-gradient-border"></div></div></div></div></div><div   id="w-0io0loz8" class="com-text-block p-absolute" ><div class="text-block"><h4 class="text-block-css full-width">(263 đánh giá)</h4></div></div><div   id="w-kymgp7jk" class="com-text-block p-absolute" ><div class="text-block"><h4 class="text-block-css full-width">713 lượt mua</h4></div></div><div   id="w-0b4fei3j" class="p-absolute" ><div class="full-width full-height"><div class="line-css full-width horizontal-line"><div class="line-container"></div></div></div></div><div   id="w-m5jrd3qq" class="p-absolute" ><div class="full-width full-height"><div class="line-css full-width horizontal-line"><div class="line-container"></div></div></div></div><div id="w-ovd74i9c" class="p-absolute product-price-bar-custom"><div class="price-bar-content"><span class="price-label">Giá:</span><span class="price-amount">329.000 vnđ/đôi</span></div></div><div   id="w-lpygqz00" class="p-absolute" ><div class="list-paragraph-container"><ul><li>Giao hàng tận nơi
 </li><li>Được kiểm tra hàng trước khi thanh toán
 </li><li>Đổi trả trong vòng 7 ngày</li><li>Thời gian giao hàng 3-5 ngày
 </li><li>Hình thật 100%</li></ul></div></div><div   id="w-fwxq3esd" class="p-absolute group-auto-scroll sroll-size" ><div class="group-container"><div   id="w-3knzv9m0" class="com-text-block p-absolute" ><div class="text-block"><h3 class="text-block-css full-width">Bảo hành<br>6 tháng</h3></div></div><div   id="w-wvzydscq" class="com-text-block p-absolute" ><div class="text-block"><h3 class="text-block-css full-width">Miễn phí giao hàng toàn quốc<br></h3></div></div><div   id="w-nfip16d4" class="com-rectangle p-absolute" ><div class="rectangle-css full-mask-size mask-position full-height full-width "><div class="rectangle-gradient-border"></div></div></div><div   id="w-lpi7q6lj" class="p-absolute" ><div class="line-css full-width horizontal-line"><div class="line-container"></div></div></div><div   id="w-wrjbdsmd" class="p-absolute" ><div class="line-css full-width horizontal-line"><div class="line-container"></div></div></div></div></div><div   id="w-cz6dtc4w" class="com-button p-absolute" ><div class="button-css full-height full-width "><span class="button-loader"></span><div class="button-text u-select-none">ĐẶT HÀNG NGAY</div><div class="gradient-border-el"></div></div></div><div   id="w-98xjkbwo" class="com-button p-absolute" ><div class="button-css full-height full-width "><span class="button-loader"></span><div class="button-text u-select-none">BẢNG SIZE</div><div class="gradient-border-el"></div></div></div><div   id="w-4yhen1pl" class="com-text-block p-absolute" ><div class="text-block"><h3 class="text-block-css full-width">Giày Thể Thao Hammer</h3></div></div><div   id="w-3zkb84sy" class="com-gallery p-absolute" ><div class="gallery-wrapper full-width full-height p-absolute"><div class="gallery-view p-absolute"><div 
@@ -563,7 +585,34 @@ fbq("init", "1441661348054461", {external_id: window.pixel_external_id});;
 
   </div>
 </footer>
-<div   id="w-__popup_default__" class="com-popup d-none popup-center" ><div class="popup-wrapper p-absolute full-width full-height"><div class="popup-background p-absolute full-width full-height"></div><div   id="w-au0o7yap" class="com-rectangle p-absolute" ><div class="rectangle-css full-mask-size mask-position full-height full-width "><div class="rectangle-gradient-border"></div></div></div></div></div><div   id="w-sqgjtecr" class="com-popup d-none popup-center" ><div class="popup-wrapper p-absolute full-width full-height"><div class="popup-background p-absolute full-width full-height"></div><div   id="w-qi85vmf5" class="com-rectangle p-absolute" ><div class="rectangle-css full-mask-size mask-position full-height full-width "><div class="rectangle-gradient-border"></div></div></div></div></div></div><div id="popup-backdrop" class="popup-backdrop full-width full-height d-none"></div><div id="lightbox" class="lightbox-backdrop full-width full-height d-none"></div><div id="login-popup" class="login-popup-wrapper"><div class="backdrop-login"></div><div class="popup-default-login"><div class="popup-login-title">Alert</div><div class="popup-login-content">Expired or Invalid Code!</div><div class="popup-login-btn">OK</div></div></div>
+<!-- MODAL POPUP ĐẶT HÀNG THÀNH CÔNG (OBSIDIAN GOLD EDITION) -->
+<div id="w-__popup_default__" class="com-popup d-none popup-center">
+  <div class="popup-wrapper">
+    <div class="obsidian-modal-card">
+      <button type="button" class="obsidian-modal-close" id="w-au0o7yap" aria-label="Đóng popup">✕</button>
+      
+      <div class="obsidian-modal-badge">
+        <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#000000" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M18 6L7 17l-5-5"></path>
+          <path d="M22 10l-7.5 7.5-2.5-2.5"></path>
+        </svg>
+      </div>
+
+      <h2 class="obsidian-modal-title">ĐẶT HÀNG THÀNH CÔNG!</h2>
+      <div class="obsidian-gold-line"></div>
+
+      <p class="obsidian-modal-sub1">Cảm ơn quý khách đã tin tưởng và lựa chọn</p>
+      <p class="obsidian-modal-brand">/// GIÀY BẢO HỘ HÙNG VIỆT. ///</p>
+      <p class="obsidian-modal-desc">Chúng tôi đã nhận được thông tin đặt hàng. Nhân viên sẽ sớm liên hệ để xác nhận đơn hàng và tư vấn size phù hợp.</p>
+
+      <div id="obsidian-order-details" class="obsidian-order-details"></div>
+
+      <button type="button" id="btn-modal-hoantat" class="obsidian-btn-complete">HOÀN TẤT &gt;</button>
+
+      <div class="obsidian-modal-slogan">— AN TOÀN – BỀN BỈ – VỮNG BƯỚC —</div>
+    </div>
+  </div>
+</div><div   id="w-sqgjtecr" class="com-popup d-none popup-center" ><div class="popup-wrapper p-absolute full-width full-height"><div class="popup-background p-absolute full-width full-height"></div><div   id="w-qi85vmf5" class="com-rectangle p-absolute" ><div class="rectangle-css full-mask-size mask-position full-height full-width "><div class="rectangle-gradient-border"></div></div></div></div></div></div><div id="popup-backdrop" class="popup-backdrop full-width full-height d-none"></div><div id="lightbox" class="lightbox-backdrop full-width full-height d-none"></div><div id="login-popup" class="login-popup-wrapper"><div class="backdrop-login"></div><div class="popup-default-login"><div class="popup-login-title">Alert</div><div class="popup-login-content">Expired or Invalid Code!</div><div class="popup-login-btn">OK</div></div></div>
 <style>
 
 
@@ -1560,34 +1609,37 @@ fbq("init", "1441661348054461", {external_id: window.pixel_external_id});;
   text-align: left !important;
 }
 
-/* Section 3 Header: BẢNG GIÁ ƯU ĐÃI - fix line wrap & overlap bug */
+/* Section 3 Header: BẢNG GIÁ ƯU ĐÃI - Chống tuyệt đối lỗi rớt chữ & đè chữ */
 #w-1dwu6rc9 {
-  top: 48px !important;
+  top: 36px !important;
   left: 0 !important;
+  right: 0 !important;
   width: 100% !important;
   height: 24px !important;
   display: flex !important;
   justify-content: center !important;
   align-items: center !important;
+  z-index: 10 !important;
 }
 
 #w-1dwu6rc9 .group-container {
   display: inline-flex !important;
   align-items: center !important;
   justify-content: center !important;
-  gap: 10px !important;
+  gap: 8px !important;
   width: auto !important;
-  position: relative !important;
+  position: static !important;
 }
 
 #w-yevznv0t {
   position: static !important;
   order: -1 !important;
-  width: 24px !important;
+  width: 26px !important;
   height: 4px !important;
-  background: #FFC400 !important;
+  background: #FFB800 !important;
   border-radius: 2px !important;
   flex-shrink: 0 !important;
+  margin: 0 !important;
 }
 
 #w-yevznv0t .line-container {
@@ -1597,7 +1649,12 @@ fbq("init", "1441661348054461", {external_id: window.pixel_external_id});;
 #w-9uq8w857 {
   position: static !important;
   width: auto !important;
+  max-width: 100% !important;
   height: auto !important;
+}
+
+#w-9uq8w857 .text-block {
+  width: auto !important;
 }
 
 #w-9uq8w857 .text-block-css {
@@ -1605,124 +1662,282 @@ fbq("init", "1441661348054461", {external_id: window.pixel_external_id});;
   font-size: 16px !important;
   font-weight: 700 !important;
   color: #111111 !important;
-  letter-spacing: 1.5px !important;
+  letter-spacing: 1.2px !important;
   white-space: nowrap !important;
   line-height: 1 !important;
   text-transform: uppercase !important;
 }
 
 #w-dxm0gd6k {
-  top: 80px !important;
+  top: 70px !important;
   left: 0 !important;
+  right: 0 !important;
   width: 100% !important;
   height: auto !important;
+  text-align: center !important;
+  z-index: 10 !important;
+}
+
+#w-dxm0gd6k .text-block {
+  width: 100% !important;
   text-align: center !important;
 }
 
 #w-dxm0gd6k .text-block-css {
   font-family: 'Oswald', sans-serif !important;
   font-size: 28px !important;
-  font-weight: 700 !important;
+  font-weight: 800 !important;
   color: #111111 !important;
   letter-spacing: 0.5px !important;
   text-align: center !important;
   line-height: 1.2 !important;
+  white-space: nowrap !important;
 }
 
-/* Modern High-Converting Product Price Bar */
-.modern-product-price-bar {
-  top: 642px !important;
-  left: 14px !important;
-  width: 392px !important;
-  height: 56px !important;
-  background: linear-gradient(135deg, #FFC400 0%, #FFB000 100%) !important;
-  border-radius: 10px !important;
-  box-shadow: 0 4px 16px rgba(255, 196, 0, 0.4) !important;
+/* High-Impact Solid Yellow Price Bar (Khớp 100% Ảnh Mẫu Chuẩn: Giá: 399.000 vnđ/đôi trên 1 dòng) */
+.product-price-bar-custom,
+#w-0x26p1fp, #w-d1yhd4gu, #w-ovd74i9c {
+  top: 645px !important;
+  left: 0px !important;
+  width: 100% !important;
+  max-width: 420px !important;
+  height: 54px !important;
+  background: #FFB800 !important;
+  border-radius: 0px !important;
+  box-shadow: none !important;
   display: flex !important;
   align-items: center !important;
+  justify-content: center !important;
   padding: 0 16px !important;
   z-index: 5 !important;
   box-sizing: border-box !important;
 }
 
-.modern-product-price-bar .product-price-inner {
-  display: flex !important;
-  justify-content: space-between !important;
-  align-items: center !important;
-  width: 100% !important;
-}
-
-.modern-product-price-bar .product-price-left {
-  display: flex !important;
-  flex-direction: column !important;
-  align-items: flex-start !important;
-  gap: 3px !important;
-}
-
-.modern-product-price-bar .product-deal-badge {
-  background: #111111 !important;
-  color: #FFC400 !important;
-  font-family: 'Roboto', sans-serif !important;
-  font-size: 11px !important;
-  font-weight: 800 !important;
-  padding: 2px 7px !important;
-  border-radius: 4px !important;
-  letter-spacing: 0.5px !important;
-  text-transform: uppercase !important;
-  line-height: 1.2 !important;
-}
-
-.modern-product-price-bar .product-orig-price {
-  font-family: 'Roboto', sans-serif !important;
-  font-size: 12px !important;
-  font-weight: 500 !important;
-  color: #374151 !important;
-  line-height: 1.2 !important;
-}
-
-.modern-product-price-bar .product-orig-price del {
-  color: #6b7280 !important;
-  text-decoration: line-through !important;
-  font-weight: 600 !important;
-}
-
-.modern-product-price-bar .product-price-right {
+.price-bar-content {
   display: flex !important;
   align-items: baseline !important;
-  gap: 4px !important;
+  justify-content: center !important;
+  gap: 8px !important;
+  width: 100% !important;
+  white-space: nowrap !important;
 }
 
-.modern-product-price-bar .product-curr-price {
-  font-family: 'Oswald', sans-serif !important;
-  font-size: 36px !important;
+.price-bar-content .price-label {
+  font-family: 'Roboto', sans-serif !important;
+  font-size: 22px !important;
+  font-weight: 700 !important;
+  color: #111111 !important;
+  line-height: 1 !important;
+  white-space: nowrap !important;
+}
+
+.price-bar-content .price-amount {
+  font-family: 'Oswald', 'Roboto', sans-serif !important;
+  font-size: 34px !important;
   font-weight: 800 !important;
   color: #111111 !important;
   letter-spacing: 0.5px !important;
   line-height: 1 !important;
+  white-space: nowrap !important;
 }
 
-.modern-product-price-bar .product-curr-unit {
-  font-family: 'Roboto', sans-serif !important;
-  font-size: 14px !important;
-  font-weight: 700 !important;
-  color: #1f2937 !important;
-}
-
-/* Upgraded Bullet Points in Product Cards */
+/* Upgraded Bullet Points in Product Cards (Chấm đỏ hồng chuẩn ảnh mẫu) */
 #w-wiigvfia .list-paragraph-container ul li,
 #w-hcjx3m92 .list-paragraph-container ul li,
 #w-lpygqz00 .list-paragraph-container ul li {
   font-size: 15px !important;
-  font-weight: 600 !important;
-  color: #1e293b !important;
-  line-height: 1.75 !important;
+  font-weight: 500 !important;
+  color: #111111 !important;
+  line-height: 1.8 !important;
 }
 
 #w-wiigvfia .list-paragraph-container ul li:before,
 #w-hcjx3m92 .list-paragraph-container ul li:before,
 #w-lpygqz00 .list-paragraph-container ul li:before {
-  background-color: #16a34a !important;
-  color: #16a34a !important;
+  background-color: #e11d48 !important;
+  color: #e11d48 !important;
+}
+
+/* Backdrop & Popup: TUYỆT ĐỐI KHÔNG LÀM MỜ / TỐI MÀN HÌNH */
+#popup-backdrop, .popup-backdrop {
+  background: transparent !important;
+  background-color: transparent !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  opacity: 0 !important;
+  pointer-events: auto !important;
+}
+
+#lightbox, .lightbox-backdrop {
+  background: transparent !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+/* Modal Popup Đặt Hàng Thành Công (Chuẩn Obsidian Gold Edition) */
+#w-__popup_default__ {
+  position: fixed !important;
+  top: 50% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%) !important;
+  z-index: 1000002 !important;
+  width: 92% !important;
+  max-width: 380px !important;
+  height: auto !important;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+#w-__popup_default__ .popup-wrapper {
+  background: transparent !important;
+  padding: 0 !important;
+  width: 100% !important;
+  height: auto !important;
+  position: relative !important;
+  box-shadow: none !important;
+  border: none !important;
+}
+
+#w-__popup_default__ .popup-background {
+  display: none !important;
+}
+
+.obsidian-modal-card {
+  background: #0d0f14 !important;
+  border: 2px solid #FFC400 !important;
+  border-radius: 18px !important;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.8), 0 0 25px rgba(255, 196, 0, 0.25) !important;
+  padding: 24px 20px 20px 20px !important;
+  text-align: center !important;
+  position: relative !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+  color: #ffffff !important;
+  font-family: 'Roboto', -apple-system, sans-serif !important;
+}
+
+#w-__popup_default__ #w-au0o7yap,
+.obsidian-modal-close {
+  position: absolute !important;
+  top: 12px !important;
+  right: 14px !important;
+  left: auto !important;
+  width: 32px !important;
+  height: 32px !important;
+  background: transparent !important;
+  border: none !important;
+  color: #9ca3af !important;
+  font-size: 22px !important;
+  line-height: 1 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  cursor: pointer !important;
+  transition: color 0.2s ease !important;
+  z-index: 10 !important;
+}
+
+#w-__popup_default__ #w-au0o7yap:hover,
+.obsidian-modal-close:hover {
+  color: #ffffff !important;
+}
+
+.obsidian-modal-badge {
+  width: 64px !important;
+  height: 64px !important;
+  border-radius: 50% !important;
+  background: #FFC400 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  margin: 4px auto 14px auto !important;
+  box-shadow: 0 4px 20px rgba(255, 196, 0, 0.45) !important;
+}
+
+.obsidian-modal-title {
+  color: #FFC400 !important;
+  font-size: 21px !important;
+  font-weight: 800 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.5px !important;
+  margin: 0 0 6px 0 !important;
+  line-height: 1.25 !important;
+}
+
+.obsidian-gold-line {
+  width: 80px !important;
+  height: 2px !important;
+  background: linear-gradient(90deg, transparent, #FFC400, transparent) !important;
+  margin: 0 auto 12px auto !important;
+}
+
+.obsidian-modal-sub1 {
+  color: #e2e8f0 !important;
+  font-size: 13px !important;
+  margin: 0 0 4px 0 !important;
+  font-weight: 400 !important;
+}
+
+.obsidian-modal-brand {
+  color: #FFB800 !important;
+  font-size: 14.5px !important;
+  font-weight: 800 !important;
+  margin: 0 0 10px 0 !important;
+  letter-spacing: 0.5px !important;
+}
+
+.obsidian-modal-desc {
+  color: #94a3b8 !important;
+  font-size: 12.5px !important;
+  line-height: 1.55 !important;
+  margin: 0 auto 14px auto !important;
+  max-width: 310px !important;
+}
+
+.obsidian-order-details {
+  background: rgba(255, 255, 255, 0.04) !important;
+  border: 1px dashed rgba(255, 196, 0, 0.35) !important;
+  border-radius: 10px !important;
+  padding: 10px 14px !important;
+  margin-bottom: 16px !important;
+  text-align: left !important;
+  font-size: 12px !important;
+  color: #cbd5e1 !important;
+  line-height: 1.5 !important;
+}
+
+.obsidian-btn-complete {
+  width: 100% !important;
+  height: 48px !important;
+  background: #FFC400 !important;
+  color: #000000 !important;
+  font-size: 16px !important;
+  font-weight: 800 !important;
+  border-radius: 12px !important;
+  border: none !important;
+  cursor: pointer !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 6px !important;
+  box-shadow: 0 4px 18px rgba(255, 196, 0, 0.4) !important;
+  transition: all 0.2s ease !important;
+}
+
+.obsidian-btn-complete:hover {
+  background: #eab308 !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 6px 22px rgba(255, 196, 0, 0.55) !important;
+}
+
+.obsidian-modal-slogan {
+  color: #64748b !important;
+  font-size: 11px !important;
+  font-weight: 600 !important;
+  letter-spacing: 1px !important;
+  margin-top: 14px !important;
+  text-align: center !important;
 }
 
 /* Order Form Section Height & Submit Button */
@@ -1770,20 +1985,8 @@ function getStoredSystemConfig() {
 const sysConfig = getStoredSystemConfig();
 const APPS_SCRIPT_URL = sysConfig.appsScriptUrl || "YOUR_GOOGLE_APPS_SCRIPT_URL_HERE";
 
-// Tự động kích hoạt Facebook Pixel từ cấu hình Admin (hoặc mặc định)
-const activeFbPixel = sysConfig.fbPixelId || '1441661348054461';
-if (activeFbPixel) {
-  !function(f,b,e,v,n,t,s)
-  {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-  n.callMethod.apply(n,arguments):n.queue.push(arguments)};
-  if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
-  n.queue=[];t=b.createElement(e);t.async=!0;
-  t.src=v;s=b.getElementsByTagName(e)[0];
-  s.parentNode.insertBefore(t,s)}(window, document,'script',
-  'https://connect.facebook.net/en_US/fbevents.js');
-  fbq('init', activeFbPixel);
-  fbq('track', 'PageView');
-}
+// Tự động kích hoạt Facebook Pixel từ cấu hình Admin (hoặc mặc định đã nạp tại thẻ head)
+const activeFbPixel = window.ACTIVE_FB_PIXEL_ID || sysConfig.fbPixelId || '1441661348054461';
 
 // Tự động kích hoạt Google Pixel (GA4 / Google Ads) nếu có cấu hình
 if (sysConfig.googlePixelId) {
@@ -2080,7 +2283,8 @@ initGallery(document.getElementById('w-3zkb84sy'), { autoplay: false });
   function openPopup(popupEl) {
     if (popupEl) popupEl.classList.remove('d-none');
     if (backdrop) backdrop.classList.remove('d-none');
-    document.body.style.overflow = 'hidden';
+    // Giữ nguyên giao diện không làm mờ, không giật màn hình
+    document.body.style.overflow = '';
   }
 
   function closeAllPopups() {
@@ -2102,11 +2306,13 @@ initGallery(document.getElementById('w-3zkb84sy'), { autoplay: false });
     }
   });
 
-  // Nút đóng Popups (Icon X & Backdrop)
+  // Nút đóng Popups (Icon X, Nút Hoàn Tất & Backdrop)
   const closeBtnSize = document.getElementById('w-qi85vmf5');
   const closeBtnSuccess = document.getElementById('w-au0o7yap');
+  const btnModalDone = document.getElementById('btn-modal-hoantat');
   if (closeBtnSize) closeBtnSize.addEventListener('click', closeAllPopups);
   if (closeBtnSuccess) closeBtnSuccess.addEventListener('click', closeAllPopups);
+  if (btnModalDone) btnModalDone.addEventListener('click', closeAllPopups);
   if (backdrop) backdrop.addEventListener('click', closeAllPopups);
 
   // D. Cuộn mượt (Smooth Scroll) tới Form Đặt Hàng
@@ -2117,13 +2323,40 @@ initGallery(document.getElementById('w-3zkb84sy'), { autoplay: false });
     }
   }
 
-  // Các nút CTA cuộn xuống form
+  // Theo dõi sự kiện Bắt đầu thanh toán (InitiateCheckout) cho Facebook Pixel
+  let hasFiredInitiateCheckout = false;
+  function triggerInitiateCheckout() {
+    if (hasFiredInitiateCheckout) return;
+    hasFiredInitiateCheckout = true;
+    const currentFbPixel = window.ACTIVE_FB_PIXEL_ID || sysConfig.fbPixelId || '1441661348054461';
+    if (window.fbq) {
+      try {
+        fbq('track', 'InitiateCheckout', {
+          content_name: productSelect && productSelect.value ? productSelect.value : 'Giày Bảo Hộ Hùng Việt',
+          content_category: 'Giày Bảo Hộ Lao Động',
+          currency: 'VND',
+          value: 329000
+        });
+      } catch(e) {}
+    }
+    if (currentFbPixel) {
+      try {
+        const beaconInit = new Image();
+        beaconInit.src = 'https://www.facebook.com/tr/?id=' + encodeURIComponent(currentFbPixel) +
+          '&ev=InitiateCheckout&cd[currency]=VND&cd[value]=329000&noscript=1';
+      } catch(e) {}
+    }
+    console.log('✓ [Meta Pixel] Fired InitiateCheckout for Pixel:', currentFbPixel);
+  }
+
+  // Các nút CTA cuộn xuống form & kích hoạt InitiateCheckout
   const scrollTriggers = ['w-jqgzpy9d', 'w-9zf4c3cf', 'w-g2c5ghut', 'w-i15ovwfu'];
   scrollTriggers.forEach(id => {
     const el = document.getElementById(id);
     if (el) {
       el.addEventListener('click', (e) => {
         e.preventDefault();
+        triggerInitiateCheckout();
         scrollToForm();
       });
     }
@@ -2137,6 +2370,7 @@ initGallery(document.getElementById('w-3zkb84sy'), { autoplay: false });
   if (card1Btn) {
     card1Btn.addEventListener('click', (e) => {
       e.preventDefault();
+      triggerInitiateCheckout();
       if (productSelect) {
         productSelect.value = 'Giày Safety Cổ Cao - 399.000đ';
         productSelect.dispatchEvent(new Event('change'));
@@ -2147,6 +2381,7 @@ initGallery(document.getElementById('w-3zkb84sy'), { autoplay: false });
   if (card2Btn) {
     card2Btn.addEventListener('click', (e) => {
       e.preventDefault();
+      triggerInitiateCheckout();
       if (productSelect) {
         productSelect.value = 'Giày Safety Cổ Thấp - 329.000đ';
         productSelect.dispatchEvent(new Event('change'));
@@ -2157,6 +2392,7 @@ initGallery(document.getElementById('w-3zkb84sy'), { autoplay: false });
   if (card3Btn) {
     card3Btn.addEventListener('click', (e) => {
       e.preventDefault();
+      triggerInitiateCheckout();
       if (productSelect) {
         productSelect.value = 'Giày Thể Thao Hammer - 329.000đ';
         productSelect.dispatchEvent(new Event('change'));
@@ -2164,6 +2400,26 @@ initGallery(document.getElementById('w-3zkb84sy'), { autoplay: false });
       scrollToForm();
     });
   }
+
+  // Lắng nghe khi khách click / nhập liệu vào các ô của form
+  const formInputSelectors = [
+    'input[name="full_name"]',
+    'input[name="phone_number"]',
+    'input[name="address"]',
+    'select[name="province_id"]',
+    'select[name="district_id"]',
+    'select[name="product"]',
+    'input[name="product_design"]',
+    '.qty-tier-card',
+    '#btn-qty-minus',
+    '#btn-qty-plus'
+  ];
+  formInputSelectors.forEach(sel => {
+    document.querySelectorAll(sel).forEach(el => {
+      el.addEventListener('focus', triggerInitiateCheckout, { once: true });
+      el.addEventListener('click', triggerInitiateCheckout, { once: true });
+    });
+  });
 
   // E. Trình phát Video sản phẩm
   const videoContainer = document.getElementById('w-i5zkeukv');
@@ -2562,24 +2818,96 @@ initGallery(document.getElementById('w-3zkb84sy'), { autoplay: false });
       console.warn('LocalStorage error:', e);
     }
 
-    // Kích hoạt sự kiện Purchase / PlaceAnOrder cho các Marketing Pixel
+    // Kích hoạt toàn bộ sự kiện chuyển đổi cho Facebook Pixel, Google & TikTok
     try {
       const numVal = parseInt((calcResult.totalAmount || '0').replace(/[^0-9]/g, '')) || 0;
+      const unitVal = parseInt((calcResult.unitPrice || '0').replace(/[^0-9]/g, '')) || 0;
+      const currentFbPixel = window.ACTIVE_FB_PIXEL_ID || sysConfig.fbPixelId || '1441661348054461';
+
       if (window.fbq) {
+        // 1. Sự kiện Purchase (Mua hàng - chuẩn e-commerce Facebook)
         fbq('track', 'Purchase', {
           value: numVal,
           currency: 'VND',
           content_name: product,
+          content_type: 'product',
+          content_ids: [product],
+          contents: [{
+            id: product,
+            quantity: calcResult.quantity,
+            item_price: unitVal
+          }],
           num_items: calcResult.quantity
         });
+
+        // 2. Sự kiện Lead (Khách hàng tiềm năng - tối ưu chiến dịch Lead)
+        fbq('track', 'Lead', {
+          value: numVal,
+          currency: 'VND',
+          content_name: product
+        });
+
+        // 3. Sự kiện CompleteRegistration (Hoàn tất đăng ký đặt hàng)
+        fbq('track', 'CompleteRegistration', {
+          content_name: product,
+          value: numVal,
+          currency: 'VND',
+          status: true
+        });
+
+        // 4. Sự kiện AddPaymentInfo (Phương thức COD)
+        fbq('track', 'AddPaymentInfo', {
+          value: numVal,
+          currency: 'VND',
+          content_name: product
+        });
+
+        // 5. Sự kiện Contact
+        fbq('track', 'Contact');
       }
+
+      // Fallback 100% bằng Image Beacon (đảm bảo bắn về Meta ngay cả khi trình duyệt bật Adblock chặn script)
+      if (currentFbPixel) {
+        const beaconPur = new Image();
+        beaconPur.src = 'https://www.facebook.com/tr/?id=' + encodeURIComponent(currentFbPixel) +
+          '&ev=Purchase&cd[value]=' + numVal +
+          '&cd[currency]=VND' +
+          '&cd[content_name]=' + encodeURIComponent(product) +
+          '&cd[num_items]=' + calcResult.quantity +
+          '&noscript=1';
+
+        const beaconLead = new Image();
+        beaconLead.src = 'https://www.facebook.com/tr/?id=' + encodeURIComponent(currentFbPixel) +
+          '&ev=Lead&cd[value]=' + numVal +
+          '&cd[currency]=VND' +
+          '&cd[content_name]=' + encodeURIComponent(product) +
+          '&noscript=1';
+
+        const beaconReg = new Image();
+        beaconReg.src = 'https://www.facebook.com/tr/?id=' + encodeURIComponent(currentFbPixel) +
+          '&ev=CompleteRegistration&cd[value]=' + numVal +
+          '&cd[currency]=VND' +
+          '&cd[content_name]=' + encodeURIComponent(product) +
+          '&noscript=1';
+      }
+
+      console.log('✓ [Meta Pixel] Fired events: Purchase, Lead, CompleteRegistration, AddPaymentInfo, Contact for ID:', currentFbPixel);
+
       if (typeof gtag === 'function') {
         gtag('event', 'purchase', {
           transaction_id: orderId,
           value: numVal,
           currency: 'VND',
-          items: [{ item_name: product, quantity: calcResult.quantity, price: numVal }]
+          items: [{ item_name: product, quantity: calcResult.quantity, price: unitVal }]
         });
+        if (sysConfig.googlePixelId) {
+          gtag('event', 'conversion', {
+            send_to: sysConfig.googlePixelId,
+            value: numVal,
+            currency: 'VND',
+            transaction_id: orderId
+          });
+        }
       }
       if (window.ttq) {
         ttq.track('PlaceAnOrder', {
@@ -2587,7 +2915,12 @@ initGallery(document.getElementById('w-3zkb84sy'), { autoplay: false });
           content_type: 'product',
           content_name: product,
           quantity: calcResult.quantity,
-          price: numVal,
+          price: unitVal,
+          value: numVal,
+          currency: 'VND'
+        });
+        ttq.track('CompleteRegistration', {
+          content_name: product,
           value: numVal,
           currency: 'VND'
         });
@@ -2616,26 +2949,22 @@ initGallery(document.getElementById('w-3zkb84sy'), { autoplay: false });
     if (btnTextEl) btnTextEl.textContent = originalText;
     if (btnLoader) btnLoader.classList.remove('loading');
 
-    // Cập nhật thông tin chi tiết vào Popup thành công
-    let detailBox = popupSuccess.querySelector('.order-success-details');
-    if (!detailBox) {
-      detailBox = document.createElement('div');
-      detailBox.className = 'order-success-details';
-      popupSuccess.querySelector('.popup-wrapper').appendChild(detailBox);
+    // Cập nhật thông tin chi tiết vào Modal Obsidian Thành Công
+    const detailBox = document.getElementById('obsidian-order-details');
+    if (detailBox) {
+      detailBox.innerHTML = `
+        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px dashed rgba(255,196,0,0.3); padding-bottom: 5px; margin-bottom: 7px;">
+          <span style="color: #94a3b8; font-size: 11.5px;">Mã đơn hàng:</span>
+          <span style="color: #FFC400; font-weight: 800; font-size: 12.5px; font-family: monospace;">#${orderId}</span>
+        </div>
+        <div style="margin-bottom: 3px;"><span style="color: #94a3b8;">Khách hàng:</span> <strong style="color: #ffffff;">${fullName}</strong> (${phone})</div>
+        <div style="margin-bottom: 3px;"><span style="color: #94a3b8;">Sản phẩm:</span> <strong style="color: #ffffff;">${product}</strong> (Size ${size})</div>
+        <div style="margin-bottom: 3px;"><span style="color: #94a3b8;">Số lượng:</span> <strong style="color: #ffffff;">${calcResult.quantity} đôi</strong> • <span style="color: #FFC400; font-weight: 800;">${calcResult.totalAmount}</span></div>
+        <div style="margin-top: 6px; color: #22c55e; font-size: 11.5px; font-weight: 500;">✓ ${calcResult.promoNote}</div>
+      `;
     }
-    detailBox.innerHTML = `
-      <div style="font-weight:bold;color:#1e7e34;margin-bottom:6px;font-size:15px;">✓ ĐẶT HÀNG THÀNH CÔNG!</div>
-      <div style="margin-bottom:3px;"><strong>Mã đơn:</strong> <span style="color:#d97706;font-weight:700;">${orderId}</span></div>
-      <div style="margin-bottom:3px;"><strong>Khách hàng:</strong> ${fullName} - ${phone}</div>
-      <div style="margin-bottom:3px;"><strong>Sản phẩm:</strong> ${product} (Size: ${size})</div>
-      <div style="margin-bottom:3px;"><strong>Số lượng:</strong> <span style="font-weight:700;color:#0f172a;">${calcResult.quantity} đôi</span> (${calcResult.unitPrice}/đôi)</div>
-      <div style="margin-bottom:3px;"><strong>Tổng thanh toán:</strong> <span style="font-size:16px;font-weight:900;color:#dc2626;">${calcResult.totalAmount}</span></div>
-      <div style="margin-bottom:3px;color:#16a34a;font-weight:600;">🎁 ${calcResult.promoNote}</div>
-      <div style="margin-bottom:3px;"><strong>Giao tới:</strong> ${address}, ${district}, ${province}</div>
-      <div style="color:#e65100;margin-top:8px;font-weight:600;background:#fff7ed;padding:6px 10px;border-radius:6px;border:1px dashed #fdba74;">📞 Shop sẽ gọi điện xác nhận đơn trước khi giao hàng!</div>
-    `;
 
-    // Mở Popup Đặt Hàng Thành Công
+    // Mở Popup Đặt Hàng Thành Công (Nền giữ nguyên trong suốt, không làm mờ màn hình)
     openPopup(popupSuccess);
 
     // Reset Form
