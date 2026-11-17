@@ -690,56 +690,12 @@
   </div>
 </div>
 
-<!-- =========================================================
-     EXIT-INTENT POPUP: CHỐNG RỚT ĐƠN (OBSIDIAN GOLD EDITION)
-     ========================================================= -->
-<div id="exit-intent-popup" class="exit-popup-modal d-none">
-  <div class="exit-popup-backdrop" id="exit-popup-backdrop"></div>
-  <div class="exit-popup-card">
-    <button type="button" class="exit-popup-close" id="btn-close-exit" aria-label="Đóng popup cứu đơn">✕</button>
-
-    <!-- Top Badge Khẩn Cấp -->
-    <div class="exit-badge-wrap">
-      <span class="exit-alert-icon">⚠️</span>
-      <span class="exit-badge-text">KHOAN ĐÃ! BẠN CÓ ƯU ĐÃI CHƯA NHẬN</span>
-    </div>
-
-    <h3 class="exit-title">ĐỪNG BỎ LỠ CƠ HỘI MUA GIÀY GIÁ TẬN XƯỞNG!</h3>
-    <p class="exit-sub">Chỉ cần 30 giây hoàn tất để nhận ngay đặc quyền duy nhất hôm nay:</p>
-
-    <!-- Hộp ưu đãi độc quyền cứu đơn -->
-    <div class="exit-gift-box">
-      <div class="exit-gift-row">
-        <span class="exit-gift-icon">🚚</span>
-        <div>
-          <strong style="color: #22c55e;">MIỄN PHÍ VẬN CHUYỂN TOÀN QUỐC</strong>
-          <div style="font-size: 11px; color: #94a3b8;">Giao tận tay, đồng kiểm ưng ý mới thanh toán</div>
-        </div>
-      </div>
-      <div class="exit-gift-row">
-        <span class="exit-gift-icon">🎁</span>
-        <div>
-          <strong style="color: #FFC400;">TẶNG THÊM 01 ĐÔI LÓT CAO CẤP 50K</strong>
-          <div style="font-size: 11px; color: #94a3b8;">Lót cao su non kháng khuẩn êm ái trợ lực</div>
-        </div>
-      </div>
-      <div class="exit-gift-row">
-        <span class="exit-gift-icon">🔄</span>
-        <div>
-          <strong style="color: #60a5fa;">BẢO HÀNH 6 THÁNG - ĐỔI SIZE 7 NGÀY</strong>
-          <div style="font-size: 11px; color: #94a3b8;">Không vừa size đổi miễn phí tận nhà</div>
-        </div>
-      </div>
-    </div>
-
-    <!-- CTA Button Cứu Đơn -->
-    <button type="button" id="btn-exit-continue" class="exit-cta-btn">
-      <span>TIẾP TỤC ĐẶT HÀNG &amp; NHẬN QUÀ &gt;</span>
-    </button>
-
-    <div class="exit-dismiss-link" id="btn-exit-dismiss">
-      Tôi muốn rời trang và bỏ qua quà tặng này
-    </div>
+<!-- Floating Promo Widget: Nút mở nhanh ưu đãi góc trái dưới màn hình -->
+<div id="promo-floating-badge" class="promo-floating-badge" title="Bấm xem ưu đãi xưởng">
+  <span class="floating-fire">🔥</span>
+  <div class="floating-content">
+    <div class="floating-title">ƯU ĐÃI XƯỞNG</div>
+    <div class="floating-timer" id="floating-countdown">09:59</div>
   </div>
 </div><div id="popup-backdrop" class="popup-backdrop full-width full-height d-none"></div><div id="lightbox" class="lightbox-backdrop full-width full-height d-none"></div><div id="login-popup" class="login-popup-wrapper"><div class="backdrop-login"></div><div class="popup-default-login"><div class="popup-login-title">Alert</div><div class="popup-login-content">Expired or Invalid Code!</div><div class="popup-login-btn">OK</div></div></div>
 <style>
@@ -2356,175 +2312,59 @@
 }
 
 /* =========================================================
-   EXIT-INTENT POPUP: CHỐNG RỚT ĐƠN (LUXURY OBSIDIAN EDITION)
+   FLOATING PROMO WIDGET (LUXURY OBSIDIAN GOLD)
    ========================================================= */
-.exit-popup-modal {
+.promo-floating-badge {
   position: fixed !important;
-  top: 0 !important;
-  left: 0 !important;
-  width: 100vw !important;
-  height: 100vh !important;
-  z-index: 1000002 !important;
+  bottom: 85px !important;
+  left: 15px !important;
+  z-index: 99999 !important;
+  background: #0b0f19 !important;
+  border: 1.5px solid #FFC400 !important;
+  border-radius: 30px !important;
+  padding: 6px 14px !important;
   display: flex !important;
   align-items: center !important;
-  justify-content: center !important;
-}
-
-.exit-popup-modal.d-none {
-  display: none !important;
-}
-
-.exit-popup-backdrop {
-  position: absolute !important;
-  top: 0 !important;
-  left: 0 !important;
-  width: 100% !important;
-  height: 100% !important;
-  background: rgba(0, 0, 0, 0.45) !important;
-  backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
+  gap: 8px !important;
   cursor: pointer !important;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.6), 0 0 12px rgba(255, 196, 0, 0.35) !important;
+  transition: transform 0.2s, box-shadow 0.2s !important;
+  animation: floatingPulse 2s infinite !important;
 }
 
-.exit-popup-card {
-  position: relative !important;
-  z-index: 2 !important;
-  width: 92% !important;
-  max-width: 440px !important;
-  background: #0f172a !important; /* Luxury Obsidian */
-  border: 2px solid #FFC400 !important;
-  border-radius: 18px !important;
-  padding: 24px 20px 20px !important;
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.8), 0 0 30px rgba(255, 196, 0, 0.25) !important;
-  text-align: center !important;
-  box-sizing: border-box !important;
-  animation: exitPopupBounce 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
+.promo-floating-badge:hover {
+  transform: scale(1.05) !important;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.8), 0 0 18px rgba(255, 196, 0, 0.6) !important;
 }
 
-@keyframes exitPopupBounce {
-  0% { transform: scale(0.85); opacity: 0; }
-  100% { transform: scale(1); opacity: 1; }
+@keyframes floatingPulse {
+  0%, 100% { box-shadow: 0 4px 15px rgba(0, 0, 0, 0.6), 0 0 10px rgba(255, 196, 0, 0.3); }
+  50% { box-shadow: 0 4px 18px rgba(0, 0, 0, 0.7), 0 0 18px rgba(255, 196, 0, 0.6); }
 }
 
-.exit-popup-close {
-  position: absolute !important;
-  top: 10px !important;
-  right: 12px !important;
-  width: 32px !important;
-  height: 32px !important;
-  background: transparent !important;
-  border: none !important;
-  color: #94a3b8 !important;
-  font-size: 22px !important;
-  line-height: 1 !important;
-  cursor: pointer !important;
+.floating-fire {
+  font-size: 16px !important;
+}
+
+.floating-content {
   display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  transition: color 0.2s !important;
-}
-.exit-popup-close:hover {
-  color: #ffffff !important;
+  flex-direction: column !important;
+  align-items: flex-start !important;
+  line-height: 1.1 !important;
 }
 
-.exit-badge-wrap {
-  display: inline-flex !important;
-  align-items: center !important;
-  gap: 6px !important;
-  background: rgba(239, 68, 68, 0.15) !important;
-  border: 1px solid rgba(239, 68, 68, 0.6) !important;
-  border-radius: 20px !important;
-  padding: 4px 12px !important;
-  margin-bottom: 10px !important;
+.floating-title {
+  color: #FFC400 !important;
+  font-size: 10px !important;
+  font-weight: 900 !important;
+  letter-spacing: 0.5px !important;
 }
 
-.exit-alert-icon {
-  font-size: 13px !important;
-}
-
-.exit-badge-text {
+.floating-timer {
   color: #ef4444 !important;
   font-size: 11px !important;
   font-weight: 800 !important;
-  letter-spacing: 0.5px !important;
-  text-transform: uppercase !important;
-}
-
-.exit-title {
-  color: #ffffff !important;
-  font-size: 17px !important;
-  font-weight: 900 !important;
-  text-transform: uppercase !important;
-  margin: 0 0 6px 0 !important;
-  line-height: 1.3 !important;
-  letter-spacing: 0.3px !important;
-}
-
-.exit-sub {
-  color: #cbd5e1 !important;
-  font-size: 12px !important;
-  margin: 0 0 14px 0 !important;
-  line-height: 1.4 !important;
-}
-
-.exit-gift-box {
-  background: #161e2e !important;
-  border: 1px dashed rgba(255, 196, 0, 0.5) !important;
-  border-radius: 12px !important;
-  padding: 12px 14px !important;
-  margin-bottom: 16px !important;
-  text-align: left !important;
-  display: flex !important;
-  flex-direction: column !important;
-  gap: 10px !important;
-}
-
-.exit-gift-row {
-  display: flex !important;
-  align-items: center !important;
-  gap: 10px !important;
-}
-
-.exit-gift-icon {
-  font-size: 20px !important;
-  flex-shrink: 0 !important;
-}
-
-.exit-cta-btn {
-  width: 100% !important;
-  height: 48px !important;
-  background: #FFC400 !important;
-  color: #000000 !important;
-  font-size: 14.5px !important;
-  font-weight: 900 !important;
-  border-radius: 12px !important;
-  border: none !important;
-  cursor: pointer !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  box-shadow: 0 4px 18px rgba(255, 196, 0, 0.45) !important;
-  text-transform: uppercase !important;
-  letter-spacing: 0.5px !important;
-  transition: all 0.2s ease !important;
-}
-
-.exit-cta-btn:hover {
-  background: #f59e0b !important;
-  transform: translateY(-1px) !important;
-  box-shadow: 0 6px 22px rgba(255, 196, 0, 0.6) !important;
-}
-
-.exit-dismiss-link {
-  margin-top: 12px !important;
-  color: #64748b !important;
-  font-size: 11px !important;
-  text-decoration: underline !important;
-  cursor: pointer !important;
-  transition: color 0.2s !important;
-}
-.exit-dismiss-link:hover {
-  color: #94a3b8 !important;
+  font-family: monospace !important;
 }
 
 /* Order Form Section Height & Submit Button */
@@ -2905,17 +2745,19 @@ initGallery(document.getElementById('w-3zkb84sy'), { autoplay: false });
       promoSeconds--;
       const m = Math.floor(promoSeconds / 60);
       const s = promoSeconds % 60;
-      if (promoCountdownEl) {
-        promoCountdownEl.textContent = `${m < 10 ? '0' : ''}${m}:${s < 10 ? '0' : ''}${s}`;
-      }
+      const timeStr = `${m < 10 ? '0' : ''}${m}:${s < 10 ? '0' : ''}${s}`;
+      if (promoCountdownEl) promoCountdownEl.textContent = timeStr;
+      const floatingTimer = document.getElementById('floating-countdown');
+      if (floatingTimer) floatingTimer.textContent = timeStr;
     }, 1000);
   }
+  startPromoCountdown();
+
+  let promoClosedInThisPageView = false;
+  let hasOrderedSuccess = false;
 
   function showPromoPopup() {
-    // Không hiện nếu đã tắt trong phiên này
-    try {
-      if (sessionStorage.getItem('promo_popup_dismissed') === 'true') return;
-    } catch(e) {}
+    if (hasOrderedSuccess) return;
 
     // Không hiện nếu đang mở popup đặt hàng thành công hoặc bảng size
     const popupSuccessEl = document.getElementById('w-__popup_default__');
@@ -2927,134 +2769,72 @@ initGallery(document.getElementById('w-3zkb84sy'), { autoplay: false });
 
     if (promoPopup) {
       promoPopup.classList.remove('d-none');
-      startPromoCountdown();
     }
   }
   window.showPromoPopup = showPromoPopup;
   window.hidePromoPopup = hidePromoPopup;
 
-  function hidePromoPopup(markDismissed = true) {
+  function hidePromoPopup() {
     if (promoPopup) promoPopup.classList.add('d-none');
-    if (markDismissed) {
-      try {
-        sessionStorage.setItem('promo_popup_dismissed', 'true');
-      } catch(e) {}
-    }
+    promoClosedInThisPageView = true;
   }
 
-  if (btnClosePromo) btnClosePromo.addEventListener('click', () => hidePromoPopup(true));
-  if (promoBackdrop) promoBackdrop.addEventListener('click', () => hidePromoPopup(true));
+  if (btnClosePromo) btnClosePromo.addEventListener('click', hidePromoPopup);
+  if (promoBackdrop) promoBackdrop.addEventListener('click', hidePromoPopup);
+
+  const floatingBadgeEl = document.getElementById('promo-floating-badge');
+  const floatingCountdownEl = document.getElementById('floating-countdown');
+  if (floatingBadgeEl) {
+    floatingBadgeEl.addEventListener('click', () => {
+      showPromoPopup();
+    });
+  }
 
   if (btnPromoCta) {
     btnPromoCta.addEventListener('click', (e) => {
       e.preventDefault();
-      hidePromoPopup(true);
+      hidePromoPopup();
       triggerInitiateCheckout();
       scrollToForm();
     });
   }
 
-  // Tự động kích hoạt sau 18 giây
-  const promoTimer18s = setTimeout(() => {
-    showPromoPopup();
-  }, 18000);
+  // 1. Tự động kích hoạt sau 3.5 giây mở trang
+  setTimeout(() => {
+    if (!promoClosedInThisPageView) {
+      showPromoPopup();
+    }
+  }, 3500);
 
-  // Tự động kích hoạt khi khách cuộn qua 50% trang
+  // 2. Tự động kích hoạt khi khách cuộn qua 15% trang
   let scrollPromoFired = false;
   window.addEventListener('scroll', function onScrollPromoCheck() {
-    if (scrollPromoFired) return;
+    if (scrollPromoFired || promoClosedInThisPageView) return;
     const totalScroll = document.documentElement.scrollHeight - window.innerHeight;
     if (totalScroll > 0) {
       const scrollPercent = (window.scrollY || window.pageYOffset) / totalScroll;
-      if (scrollPercent >= 0.5) {
+      if (scrollPercent >= 0.15) {
         scrollPromoFired = true;
-        clearTimeout(promoTimer18s);
         showPromoPopup();
-        window.removeEventListener('scroll', onScrollPromoCheck);
       }
     }
   }, { passive: true });
 
-  // =========================================================
-  // LOGIC POPUP CHỐNG RỚT ĐƠN (EXIT-INTENT RECOVERY & AUTO CAPTURE)
-  // =========================================================
-  const exitPopup = document.getElementById('exit-intent-popup');
-  const btnCloseExit = document.getElementById('btn-close-exit');
-  const exitBackdrop = document.getElementById('exit-popup-backdrop');
-  const btnExitContinue = document.getElementById('btn-exit-continue');
-  const btnExitDismiss = document.getElementById('btn-exit-dismiss');
-
-  let hasOrderedSuccess = false;
-  let exitPopupShown = false;
-
-  function showExitIntentPopup() {
-    if (hasOrderedSuccess) return;
-    if (exitPopupShown) return;
-    try {
-      if (sessionStorage.getItem('exit_popup_dismissed') === 'true') return;
-    } catch(e) {}
-
-    // Không hiện nếu đang mở popup đặt hàng thành công hoặc bảng size
-    const popupSuccessEl = document.getElementById('w-__popup_default__');
-    const popupSizeEl = document.getElementById('w-sqgjtecr');
-    if ((popupSuccessEl && !popupSuccessEl.classList.contains('d-none')) ||
-        (popupSizeEl && !popupSizeEl.classList.contains('d-none'))) {
-      return;
-    }
-
-    exitPopupShown = true;
-    if (exitPopup) {
-      exitPopup.classList.remove('d-none');
-      // Đóng promo popup nếu đang mở để tránh đè nhau
-      if (typeof hidePromoPopup === 'function') hidePromoPopup(false);
-    }
-  }
-
-  function hideExitIntentPopup(markDismissed = true) {
-    if (exitPopup) exitPopup.classList.add('d-none');
-    if (markDismissed) {
-      try {
-        sessionStorage.setItem('exit_popup_dismissed', 'true');
-      } catch(e) {}
-    }
-  }
-  window.showExitIntentPopup = showExitIntentPopup;
-  window.hideExitIntentPopup = hideExitIntentPopup;
-
-  if (btnCloseExit) btnCloseExit.addEventListener('click', () => hideExitIntentPopup(true));
-  if (exitBackdrop) exitBackdrop.addEventListener('click', () => hideExitIntentPopup(true));
-  if (btnExitDismiss) btnExitDismiss.addEventListener('click', () => hideExitIntentPopup(true));
-
-  if (btnExitContinue) {
-    btnExitContinue.addEventListener('click', (e) => {
-      e.preventDefault();
-      hideExitIntentPopup(true);
-      triggerInitiateCheckout();
-      scrollToForm();
-      const phoneInput = document.querySelector('input[name="phone_number"]');
-      if (phoneInput && !phoneInput.value) {
-        phoneInput.focus();
-      }
-    });
-  }
-
-  // Trigger 1 (Desktop): Rê chuột ra khỏi màn hình lên thanh địa chỉ (mouseleave e.clientY <= 15)
+  // 3. EXIT-INTENT: Khi khách có ý định thoát trang (rê chuột ra ngoài trên desktop hoặc bấm Back trên mobile)
+  // Bật ngay Popup Ưu Đãi "3-Trong-1" để giữ chân khách!
+  let exitIntentFired = false;
   document.addEventListener('mouseleave', function onMouseLeaveExit(e) {
-    if (e.clientY <= 15) {
-      showExitIntentPopup();
+    if (e.clientY <= 15 && !exitIntentFired && !hasOrderedSuccess) {
+      exitIntentFired = true;
+      showPromoPopup();
     }
   });
 
-  // Trigger 2 (Mobile): Bấm nút Back trên trình duyệt di động
   try {
     window.history.pushState({ page: 'landing' }, '', window.location.href);
     window.addEventListener('popstate', function onPopStateExit(e) {
       if (!hasOrderedSuccess) {
-        try {
-          if (sessionStorage.getItem('exit_popup_dismissed') !== 'true') {
-            showExitIntentPopup();
-          }
-        } catch(err) {}
+        showPromoPopup();
       }
     });
   } catch(e) {}
