@@ -688,15 +688,6 @@
       <span>🛡️ Kiểm tra hàng trước khi thanh toán • Đổi size 7 ngày</span>
     </div>
   </div>
-</div>
-
-<!-- Floating Promo Widget: Nút mở nhanh ưu đãi góc trái dưới màn hình -->
-<div id="promo-floating-badge" class="promo-floating-badge" title="Bấm xem ưu đãi xưởng">
-  <span class="floating-fire">🔥</span>
-  <div class="floating-content">
-    <div class="floating-title">ƯU ĐÃI XƯỞNG</div>
-    <div class="floating-timer" id="floating-countdown">09:59</div>
-  </div>
 </div><div id="popup-backdrop" class="popup-backdrop full-width full-height d-none"></div><div id="lightbox" class="lightbox-backdrop full-width full-height d-none"></div><div id="login-popup" class="login-popup-wrapper"><div class="backdrop-login"></div><div class="popup-default-login"><div class="popup-login-title">Alert</div><div class="popup-login-content">Expired or Invalid Code!</div><div class="popup-login-btn">OK</div></div></div>
 <style>
 
@@ -2311,62 +2302,6 @@
   gap: 4px !important;
 }
 
-/* =========================================================
-   FLOATING PROMO WIDGET (LUXURY OBSIDIAN GOLD)
-   ========================================================= */
-.promo-floating-badge {
-  position: fixed !important;
-  bottom: 85px !important;
-  left: 15px !important;
-  z-index: 99999 !important;
-  background: #0b0f19 !important;
-  border: 1.5px solid #FFC400 !important;
-  border-radius: 30px !important;
-  padding: 6px 14px !important;
-  display: flex !important;
-  align-items: center !important;
-  gap: 8px !important;
-  cursor: pointer !important;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.6), 0 0 12px rgba(255, 196, 0, 0.35) !important;
-  transition: transform 0.2s, box-shadow 0.2s !important;
-  animation: floatingPulse 2s infinite !important;
-}
-
-.promo-floating-badge:hover {
-  transform: scale(1.05) !important;
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.8), 0 0 18px rgba(255, 196, 0, 0.6) !important;
-}
-
-@keyframes floatingPulse {
-  0%, 100% { box-shadow: 0 4px 15px rgba(0, 0, 0, 0.6), 0 0 10px rgba(255, 196, 0, 0.3); }
-  50% { box-shadow: 0 4px 18px rgba(0, 0, 0, 0.7), 0 0 18px rgba(255, 196, 0, 0.6); }
-}
-
-.floating-fire {
-  font-size: 16px !important;
-}
-
-.floating-content {
-  display: flex !important;
-  flex-direction: column !important;
-  align-items: flex-start !important;
-  line-height: 1.1 !important;
-}
-
-.floating-title {
-  color: #FFC400 !important;
-  font-size: 10px !important;
-  font-weight: 900 !important;
-  letter-spacing: 0.5px !important;
-}
-
-.floating-timer {
-  color: #ef4444 !important;
-  font-size: 11px !important;
-  font-weight: 800 !important;
-  font-family: monospace !important;
-}
-
 /* Order Form Section Height & Submit Button */
 #w-37pp98w8 {
   height: 1030px !important;
@@ -2745,19 +2680,17 @@ initGallery(document.getElementById('w-3zkb84sy'), { autoplay: false });
       promoSeconds--;
       const m = Math.floor(promoSeconds / 60);
       const s = promoSeconds % 60;
-      const timeStr = `${m < 10 ? '0' : ''}${m}:${s < 10 ? '0' : ''}${s}`;
-      if (promoCountdownEl) promoCountdownEl.textContent = timeStr;
-      const floatingTimer = document.getElementById('floating-countdown');
-      if (floatingTimer) floatingTimer.textContent = timeStr;
+      if (promoCountdownEl) {
+        promoCountdownEl.textContent = `${m < 10 ? '0' : ''}${m}:${s < 10 ? '0' : ''}${s}`;
+      }
     }, 1000);
   }
-  startPromoCountdown();
-
-  let promoClosedInThisPageView = false;
-  let hasOrderedSuccess = false;
 
   function showPromoPopup() {
-    if (hasOrderedSuccess) return;
+    // Không hiện nếu đã tắt trong phiên này (sessionStorage)
+    try {
+      if (sessionStorage.getItem('promo_popup_dismissed') === 'true') return;
+    } catch(e) {}
 
     // Không hiện nếu đang mở popup đặt hàng thành công hoặc bảng size
     const popupSuccessEl = document.getElementById('w-__popup_default__');
@@ -2769,75 +2702,53 @@ initGallery(document.getElementById('w-3zkb84sy'), { autoplay: false });
 
     if (promoPopup) {
       promoPopup.classList.remove('d-none');
+      startPromoCountdown();
     }
   }
   window.showPromoPopup = showPromoPopup;
   window.hidePromoPopup = hidePromoPopup;
 
-  function hidePromoPopup() {
+  function hidePromoPopup(markDismissed = true) {
     if (promoPopup) promoPopup.classList.add('d-none');
-    promoClosedInThisPageView = true;
+    if (markDismissed) {
+      try {
+        sessionStorage.setItem('promo_popup_dismissed', 'true');
+      } catch(e) {}
+    }
   }
 
-  if (btnClosePromo) btnClosePromo.addEventListener('click', hidePromoPopup);
-  if (promoBackdrop) promoBackdrop.addEventListener('click', hidePromoPopup);
-
-  const floatingBadgeEl = document.getElementById('promo-floating-badge');
-  const floatingCountdownEl = document.getElementById('floating-countdown');
-  if (floatingBadgeEl) {
-    floatingBadgeEl.addEventListener('click', () => {
-      showPromoPopup();
-    });
-  }
+  if (btnClosePromo) btnClosePromo.addEventListener('click', () => hidePromoPopup(true));
+  if (promoBackdrop) promoBackdrop.addEventListener('click', () => hidePromoPopup(true));
 
   if (btnPromoCta) {
     btnPromoCta.addEventListener('click', (e) => {
       e.preventDefault();
-      hidePromoPopup();
+      hidePromoPopup(true);
       triggerInitiateCheckout();
       scrollToForm();
     });
   }
 
-  // 1. Tự động kích hoạt sau 3.5 giây mở trang
-  setTimeout(() => {
-    if (!promoClosedInThisPageView) {
-      showPromoPopup();
-    }
-  }, 3500);
+  // Tự động kích hoạt sau 18 giây
+  const promoTimer18s = setTimeout(() => {
+    showPromoPopup();
+  }, 18000);
 
-  // 2. Tự động kích hoạt khi khách cuộn qua 15% trang
+  // Tự động kích hoạt khi khách cuộn qua 50% trang
   let scrollPromoFired = false;
   window.addEventListener('scroll', function onScrollPromoCheck() {
-    if (scrollPromoFired || promoClosedInThisPageView) return;
+    if (scrollPromoFired) return;
     const totalScroll = document.documentElement.scrollHeight - window.innerHeight;
     if (totalScroll > 0) {
       const scrollPercent = (window.scrollY || window.pageYOffset) / totalScroll;
-      if (scrollPercent >= 0.15) {
+      if (scrollPercent >= 0.5) {
         scrollPromoFired = true;
+        clearTimeout(promoTimer18s);
         showPromoPopup();
+        window.removeEventListener('scroll', onScrollPromoCheck);
       }
     }
   }, { passive: true });
-
-  // 3. EXIT-INTENT: Khi khách có ý định thoát trang (rê chuột ra ngoài trên desktop hoặc bấm Back trên mobile)
-  // Bật ngay Popup Ưu Đãi "3-Trong-1" để giữ chân khách!
-  let exitIntentFired = false;
-  document.addEventListener('mouseleave', function onMouseLeaveExit(e) {
-    if (e.clientY <= 15 && !exitIntentFired && !hasOrderedSuccess) {
-      exitIntentFired = true;
-      showPromoPopup();
-    }
-  });
-
-  try {
-    window.history.pushState({ page: 'landing' }, '', window.location.href);
-    window.addEventListener('popstate', function onPopStateExit(e) {
-      if (!hasOrderedSuccess) {
-        showPromoPopup();
-      }
-    });
-  } catch(e) {}
 
   // =========================================================
   // TỰ ĐỘNG BẮT ĐƠN RỚT (AUTO-CAPTURE PARTIAL LEADS)
