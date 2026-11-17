@@ -389,11 +389,11 @@ fbq("init", "1441661348054461", {external_id: window.pixel_external_id});;
       <div style="font-size: 12px; font-weight: 800; color: #dc2626; margin-top: 3px;" id="tier-price-2">599.000đ</div>
     </div>
 
-    <div class="qty-tier-card" data-qty="5" style="background: #ffffff; border: 1.5px solid #cbd5e1; border-radius: 8px; padding: 8px 4px; text-align: center; cursor: pointer; transition: all 0.2s ease; position: relative;">
+    <div class="qty-tier-card" data-qty="10" style="background: #ffffff; border: 1.5px solid #cbd5e1; border-radius: 8px; padding: 8px 4px; text-align: center; cursor: pointer; transition: all 0.2s ease; position: relative;">
       <span style="position: absolute; top: -8px; right: -4px; background: #f59e0b; color: #111111; font-size: 9px; font-weight: 800; padding: 2px 6px; border-radius: 10px; text-transform: uppercase;">Giá sỉ</span>
       <div style="font-size: 13px; font-weight: 800; color: #0f172a;">Mua Sỉ</div>
-      <div style="font-size: 11px; color: #64748b; margin-top: 2px;">Từ 5 đôi</div>
-      <div style="font-size: 12px; font-weight: 800; color: #b45309; margin-top: 3px;" id="tier-price-5">Giá xưởng</div>
+      <div style="font-size: 11px; color: #64748b; margin-top: 2px;">Từ 10 đôi</div>
+      <div style="font-size: 12px; font-weight: 800; color: #b45309; margin-top: 3px;" id="tier-price-10">Từ 250.000đ</div>
     </div>
   </div>
 
@@ -2286,7 +2286,7 @@ initGallery(document.getElementById('w-3zkb84sy'), { autoplay: false });
   const tierCards = document.querySelectorAll('.qty-tier-card');
   const tierPrice1 = document.getElementById('tier-price-1');
   const tierPrice2 = document.getElementById('tier-price-2');
-  const tierPrice5 = document.getElementById('tier-price-5');
+  const tierPrice10 = document.getElementById('tier-price-10') || document.getElementById('tier-price-5');
   const summaryQtyText = document.getElementById('summary-qty-text');
   const summaryProductText = document.getElementById('summary-product-text');
   const summarySizeText = document.getElementById('summary-size-text');
@@ -2325,21 +2325,16 @@ initGallery(document.getElementById('w-3zkb84sy'), { autoplay: false });
       totalAmount = isHighTop ? 749000 : 599000;
       unitPrice = Math.round(totalAmount / 2);
       promoNote = '🎉 Combo 2 đôi: Tặng Freeship toàn quốc (Tiết kiệm ' + formatMoney(basePrice * 2 - totalAmount) + ')';
-    } else if (qty >= 3 && qty <= 4) {
-      // 3-4 đôi: Giảm 50k/đôi + Freeship
+    } else if (qty >= 3 && qty <= 9) {
+      // 3-9 đôi: Giảm 50k/đôi + Freeship
       unitPrice = basePrice - 50000;
       totalAmount = unitPrice * qty;
-      promoNote = '🎉 Tặng Freeship + Giảm 50.000đ/đôi!';
-    } else if (qty >= 5 && qty <= 9) {
-      // 5-9 đôi: Giá sỉ xưởng 250k (Cổ cao 290k) + Freeship
+      promoNote = '🎉 Mua ' + qty + ' đôi: Tặng Freeship + Giảm 50.000đ/đôi!';
+    } else {
+      // >= 10 đôi: Giá sỉ tận xưởng từ 10 đôi (250k / Cổ cao 290k) + Freeship
       unitPrice = isHighTop ? 290000 : 250000;
       totalAmount = unitPrice * qty;
-      promoNote = '🔥 Giá sỉ xưởng (' + formatMoney(unitPrice) + '/đôi) + Freeship toàn quốc!';
-    } else {
-      // >= 10 đôi: Giá đại lý 230k (Cổ cao 270k) + Freeship
-      unitPrice = isHighTop ? 270000 : 230000;
-      totalAmount = unitPrice * qty;
-      promoNote = '🚀 Giá đại lý sỉ lớn (' + formatMoney(unitPrice) + '/đôi) + Freeship toàn quốc!';
+      promoNote = '🔥 Giá sỉ xưởng từ 10 đôi (' + formatMoney(unitPrice) + '/đôi) + Freeship toàn quốc!';
     }
 
     return {
@@ -2362,9 +2357,9 @@ initGallery(document.getElementById('w-3zkb84sy'), { autoplay: false });
       const combo2Total = calc.isHighTop ? 749000 : 599000;
       tierPrice2.textContent = formatMoney(combo2Total);
     }
-    if (tierPrice5) {
+    if (tierPrice10) {
       const siPrice = calc.isHighTop ? 290000 : 250000;
-      tierPrice5.textContent = 'Từ ' + formatMoney(siPrice);
+      tierPrice10.textContent = 'Từ ' + formatMoney(siPrice);
     }
 
     // Cập nhật số lượng
@@ -2410,7 +2405,7 @@ initGallery(document.getElementById('w-3zkb84sy'), { autoplay: false });
         card.classList.add('active');
       } else if (cardQty === 2 && calc.quantity === 2) {
         card.classList.add('active');
-      } else if (cardQty === 5 && calc.quantity >= 5) {
+      } else if (cardQty === 10 && calc.quantity >= 10) {
         card.classList.add('active');
       } else {
         card.classList.remove('active');

@@ -1958,7 +1958,8 @@
 
       let total = unitPrice * qty;
       if (qty === 2) total -= 60000;
-      else if (qty >= 3) total = 299000 * qty;
+      else if (qty >= 3 && qty <= 9) total = (unitPrice - 50000) * qty;
+      else if (qty >= 10) total = (product.includes('Cổ Cao') ? 290000 : 250000) * qty;
 
       document.getElementById('editTotalAmount').value = total.toLocaleString('vi-VN') + 'đ';
     }
@@ -2012,7 +2013,8 @@
 
       let total = unitPrice * qty;
       if (qty === 2) total -= 60000;
-      else if (qty >= 3) total = 299000 * qty;
+      else if (qty >= 3 && qty <= 9) total = (unitPrice - 50000) * qty;
+      else if (qty >= 10) total = (product.includes('Cổ Cao') ? 290000 : 250000) * qty;
 
       document.getElementById('addTotalAmount').value = total.toLocaleString('vi-VN') + 'đ';
     }
