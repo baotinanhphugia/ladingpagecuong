@@ -248,7 +248,7 @@
 
 
         <noscript>
-          <img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=1441661348054461&amp;ev=PageView&amp;cd[eventID]=webcake.xrhi4rxiaa&amp;noscript=1">
+          <img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=1441661348054461&amp;ev=PageView&amp;noscript=1">
         </noscript>
 
 
@@ -2794,13 +2794,6 @@ initGallery(document.getElementById('w-3zkb84sy'), { autoplay: false });
         });
       } catch(e) {}
     }
-    if (currentFbPixel) {
-      try {
-        const beaconInit = new Image();
-        beaconInit.src = 'https://www.facebook.com/tr/?id=' + encodeURIComponent(currentFbPixel) +
-          '&ev=InitiateCheckout&cd[currency]=VND&cd[value]=329000&noscript=1';
-      } catch(e) {}
-    }
     console.log('✓ [Meta Pixel] Fired InitiateCheckout for Pixel:', currentFbPixel);
   }
 
@@ -3280,7 +3273,7 @@ initGallery(document.getElementById('w-3zkb84sy'), { autoplay: false });
       const currentFbPixel = window.ACTIVE_FB_PIXEL_ID || sysConfig.fbPixelId || '1441661348054461';
 
       if (window.fbq) {
-        // 1. Sự kiện Purchase (Mua hàng - chuẩn e-commerce Facebook)
+        // 1. Sự kiện Purchase (Mua hàng thành công - chuẩn E-commerce Meta)
         fbq('track', 'Purchase', {
           value: numVal,
           currency: 'VND',
@@ -3293,60 +3286,18 @@ initGallery(document.getElementById('w-3zkb84sy'), { autoplay: false });
             item_price: unitVal
           }],
           num_items: calcResult.quantity
-        });
+        }, { eventID: orderId });
 
-        // 2. Sự kiện Lead (Khách hàng tiềm năng - tối ưu chiến dịch Lead)
-        fbq('track', 'Lead', {
-          value: numVal,
-          currency: 'VND',
-          content_name: product
-        });
-
-        // 3. Sự kiện CompleteRegistration (Hoàn tất đăng ký đặt hàng)
+        // 2. Sự kiện CompleteRegistration (Hoàn tất đăng ký đặt hàng)
         fbq('track', 'CompleteRegistration', {
           content_name: product,
           value: numVal,
           currency: 'VND',
           status: true
-        });
-
-        // 4. Sự kiện AddPaymentInfo (Phương thức COD)
-        fbq('track', 'AddPaymentInfo', {
-          value: numVal,
-          currency: 'VND',
-          content_name: product
-        });
-
-        // 5. Sự kiện Contact
-        fbq('track', 'Contact');
+        }, { eventID: orderId + '_reg' });
       }
 
-      // Fallback 100% bằng Image Beacon (đảm bảo bắn về Meta ngay cả khi trình duyệt bật Adblock chặn script)
-      if (currentFbPixel) {
-        const beaconPur = new Image();
-        beaconPur.src = 'https://www.facebook.com/tr/?id=' + encodeURIComponent(currentFbPixel) +
-          '&ev=Purchase&cd[value]=' + numVal +
-          '&cd[currency]=VND' +
-          '&cd[content_name]=' + encodeURIComponent(product) +
-          '&cd[num_items]=' + calcResult.quantity +
-          '&noscript=1';
-
-        const beaconLead = new Image();
-        beaconLead.src = 'https://www.facebook.com/tr/?id=' + encodeURIComponent(currentFbPixel) +
-          '&ev=Lead&cd[value]=' + numVal +
-          '&cd[currency]=VND' +
-          '&cd[content_name]=' + encodeURIComponent(product) +
-          '&noscript=1';
-
-        const beaconReg = new Image();
-        beaconReg.src = 'https://www.facebook.com/tr/?id=' + encodeURIComponent(currentFbPixel) +
-          '&ev=CompleteRegistration&cd[value]=' + numVal +
-          '&cd[currency]=VND' +
-          '&cd[content_name]=' + encodeURIComponent(product) +
-          '&noscript=1';
-      }
-
-      console.log('✓ [Meta Pixel] Fired events: Purchase, Lead, CompleteRegistration, AddPaymentInfo, Contact for ID:', currentFbPixel);
+      console.log('✓ [Meta Pixel] Fired Purchase & CompleteRegistration with orderId:', orderId);
 
       if (typeof gtag === 'function') {
         gtag('event', 'purchase', {
