@@ -1657,6 +1657,8 @@
       loadOrders();
       loadAbandonedOrders();
       loadCodeGsTemplate();
+      // Tự động đồng bộ đơn hàng thật từ Google Sheets ngay khi tải trang
+      syncWithGoogleSheet();
 
       // Kiểm tra session đăng nhập hoặc hash preview
       const hash = window.location.hash || '';
@@ -1793,15 +1795,14 @@
       const raw = localStorage.getItem(STORAGE_KEY_ORDERS);
       if (raw) {
         try {
-          ordersData = JSON.parse(raw);
+          ordersData = JSON.parse(raw).filter(o => !o.order_id || !o.order_id.includes('DEMO'));
         } catch (e) {
           ordersData = [];
         }
       } else {
-        // Khởi tạo danh sách đơn rỗng sẵn sàng đón đơn thật 100%
         ordersData = [];
-        localStorage.setItem(STORAGE_KEY_ORDERS, JSON.stringify(ordersData));
       }
+      localStorage.setItem(STORAGE_KEY_ORDERS, JSON.stringify(ordersData));
       refreshUI();
     }
 
@@ -2589,15 +2590,8 @@
         const res = await fetch(url + (url.includes('?') ? '&' : '?') + 'action=getOrders&t=' + Date.now());
         const json = await res.json();
         if (json && json.status === 'success' && Array.isArray(json.orders)) {
-          // Merge orders
-          const sheetOrders = json.orders;
-          const merged = [...sheetOrders];
-          ordersData.forEach(localOrder => {
-            if (!merged.find(m => m.order_id === localOrder.order_id)) {
-              merged.push(localOrder);
-            }
-          });
-          ordersData = merged;
+          // Lọc sạch triệt để mọi đơn demo cũ và chỉ giữ lại đơn hàng thật từ Google Sheets
+          ordersData = json.orders.filter(o => !o.order_id || !o.order_id.includes('DEMO'));
           saveOrders();
           showToast(`✓ Đã đồng bộ thành công ${ordersData.length} đơn hàng từ Google Sheets!`);
         } else {
