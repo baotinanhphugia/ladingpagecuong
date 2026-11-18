@@ -1637,6 +1637,7 @@
     const STORAGE_KEY_ABANDONED = 'giaythethao_abandoned_orders';
     const STORAGE_KEY_CONFIG = 'giaythethao_config';
     const DEFAULT_PIN = 'admin123';
+    const DEFAULT_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbx4g8e8gEShYwoHSxT9o-4I1z_o5huiv22rTfnoWwuw2K3s5WsCrQm3Kwhv2fcK6FPFtA/exec';
 
     let ordersData = [];
     let currentFilter = 'all';
@@ -1797,41 +1798,8 @@
           ordersData = [];
         }
       } else {
-        // Mẫu ban đầu nếu trống
-        ordersData = [
-          {
-            order_id: 'DH-261117-DEMO1',
-            order_time: '17/11/2026 14:20:00',
-            full_name: 'Nguyễn Văn Hùng',
-            phone_number: '0988123456',
-            province: 'Hà Nội',
-            district: 'Cầu Giấy',
-            address: 'Số 12 Dịch Vọng Hậu',
-            product: 'Giày Safety Cổ Cao',
-            size: '41',
-            quantity: 1,
-            price: '399.000đ',
-            total_amount: '399.000đ',
-            status: 'Chờ xác nhận',
-            note: 'Giao giờ hành chính'
-          },
-          {
-            order_id: 'DH-261117-DEMO2',
-            order_time: '17/11/2026 15:05:00',
-            full_name: 'Trần Đình Trọng',
-            phone_number: '0912987654',
-            province: 'Hải Phòng',
-            district: 'Ngô Quyền',
-            address: '45 Lê Lợi',
-            product: 'Giày Safety Cổ Thấp',
-            size: '42',
-            quantity: 2,
-            price: '329.000đ',
-            total_amount: '598.000đ',
-            status: 'Đã gọi chốt',
-            note: 'Mua 2 đôi giảm 60k'
-          }
-        ];
+        // Khởi tạo danh sách đơn rỗng sẵn sàng đón đơn thật 100%
+        ordersData = [];
         localStorage.setItem(STORAGE_KEY_ORDERS, JSON.stringify(ordersData));
       }
       refreshUI();
@@ -2613,14 +2581,8 @@
     // Sync with Google Sheet
     async function syncWithGoogleSheet() {
       const config = JSON.parse(localStorage.getItem(STORAGE_KEY_CONFIG) || '{}');
-      const url = config.appsScriptUrl;
+      const url = config.appsScriptUrl || DEFAULT_APPS_SCRIPT_URL;
       const btn = document.getElementById('btnSyncSheet');
-
-      if (!url) {
-        alert('Chưa cấu hình Google Apps Script URL trong tab Cấu hình!');
-        switchTab('settings');
-        return;
-      }
 
       btn.textContent = '⏳ Đang đồng bộ...';
       try {
