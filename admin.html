@@ -1925,6 +1925,58 @@
       document.getElementById('count-cancelled').textContent = xCount;
     }
 
+    // Phân tích và chuyển đổi thời gian đặt hàng sang đối tượng Date chuẩn
+    function parseOrderDate(order) {
+      if (!order) return null;
+      const raw = order.order_time;
+      if (raw instanceof Date && !isNaN(raw.getTime())) return raw;
+      const str = (raw || '').toString().trim();
+
+      if (str) {
+        // 1. Khớp chuỗi định dạng ngày/tháng/năm của Việt Nam (dd/MM/yyyy hoặc dd-MM-yyyy)
+        const dMatch = str.match(/(?:^|\s|[^\d])(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})/);
+        const tMatch = str.match(/(\d{1,2}):(\d{1,2})(?::(\d{1,2}))?/);
+        if (dMatch) {
+          const day = parseInt(dMatch[1], 10);
+          const month = parseInt(dMatch[2], 10) - 1;
+          const year = parseInt(dMatch[3], 10);
+          const hour = tMatch ? parseInt(tMatch[1], 10) : 0;
+          const min = tMatch ? parseInt(tMatch[2], 10) : 0;
+          const sec = (tMatch && tMatch[3]) ? parseInt(tMatch[3], 10) : 0;
+          const d = new Date(year, month, day, hour, min, sec);
+          if (!isNaN(d.getTime())) return d;
+        }
+
+        // 2. Chuyển đổi chuẩn ISO từ Google Apps Script (ví dụ: "2026-11-19T20:23:18.000Z")
+        const parsed = new Date(str);
+        if (!isNaN(parsed.getTime())) return parsed;
+      }
+
+      // 3. Dự phòng trích xuất ngày từ mã đơn hàng (ví dụ: DH-261119-XXXX -> 2026-11-19)
+      const idMatch = (order.order_id || '').match(/(?:DH|ROT)-(\d{2})(\d{2})(\d{2})-/i);
+      if (idMatch) {
+        const y = 2000 + parseInt(idMatch[1], 10);
+        const m = parseInt(idMatch[2], 10) - 1;
+        const d = parseInt(idMatch[3], 10);
+        const fallbackDate = new Date(y, m, d, 12, 0, 0);
+        if (!isNaN(fallbackDate.getTime())) return fallbackDate;
+      }
+
+      return null;
+    }
+
+    // Hiển thị ngày giờ tiếng Việt đẹp mắt (dd/MM/yyyy HH:mm)
+    function formatDateTimeVi(rawTime, orderId) {
+      const d = parseOrderDate({ order_time: rawTime, order_id: orderId });
+      if (!d) return rawTime || '';
+      const day = String(d.getDate()).padStart(2, '0');
+      const month = String(d.getMonth() + 1).padStart(2, '0');
+      const year = d.getFullYear();
+      const hours = String(d.getHours()).padStart(2, '0');
+      const minutes = String(d.getMinutes()).padStart(2, '0');
+      return `${day}/${month}/${year} ${hours}:${minutes}`;
+    }
+
     // Kiểm tra đơn hàng có đầy đủ thông tin hợp lệ để tính vào doanh số thực tế
     function isOrderCompleteInfo(o) {
       if (!o) return false;
@@ -2068,7 +2120,7 @@
         tr.innerHTML = `
           <td>
             <span class="order-id-badge">${order.order_id || 'DH-UNKNOWN'}</span>
-            <div class="order-time-text">${order.order_time || ''}</div>
+            <div class="order-time-text">${formatDateTimeVi(order.order_time, order.order_id)}</div>
           </td>
           <td>
             <div class="cust-info-box">
@@ -2381,7 +2433,7 @@
       csv += 'Mã Đơn,Thời Gian,Họ Và Tên,Số Điện Thoại,Tỉnh Thành,Quận Huyện,Địa Chỉ Chi Tiết,Sản Phẩm,Size,Số Lượng,Tổng Tiền,Trạng Thái,Ghi Chú\n';
 
       ordersData.forEach(o => {
-        csv += `"${o.order_id || ''}","${o.order_time || ''}","${(o.full_name || '').replace(/"/g, '""')}","'${o.phone_number || ''}","${o.province || ''}","${o.district || ''}","${(o.address || '').replace(/"/g, '""')}","${o.product || ''}","${o.size || ''}","${o.quantity || 1}","${o.total_amount || ''}","${o.status || ''}","${(o.note || '').replace(/"/g, '""')}"\n`;
+        csv += `"${o.order_id || ''}","${formatDateTimeVi(o.order_time, o.order_id)}","${(o.full_name || '').replace(/"/g, '""')}","'${o.phone_number || ''}","${o.province || ''}","${o.district || ''}","${(o.address || '').replace(/"/g, '""')}","${o.product || ''}","${o.size || ''}","${o.quantity || 1}","${o.total_amount || ''}","${o.status || ''}","${(o.note || '').replace(/"/g, '""')}"\n`;
       });
 
       const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
@@ -2492,7 +2544,7 @@
         tr.innerHTML = `
           <td>
             <span class="order-id-badge" style="background: rgba(239, 68, 68, 0.15); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.3); font-weight:700;">${lead.order_id || 'ROT-UNKNOWN'}</span>
-            <div class="order-time-text">${lead.order_time || ''}</div>
+            <div class="order-time-text">${formatDateTimeVi(lead.order_time, lead.order_id)}</div>
           </td>
           <td>
             <div class="cust-info-box">
@@ -2704,7 +2756,7 @@
       csv += 'Mã Đơn Rớt,Thời Gian,Họ Tên Khách,Số Điện Thoại,Tỉnh Thành,Quận Huyện,Địa Chỉ,Sản Phẩm Quan Tâm,Size,Số Lượng,Giá Dự Kiến,Trạng Thái,Ghi Chú\n';
 
       abandonedData.forEach(o => {
-        csv += `"${o.order_id || ''}","${o.order_time || ''}","${(o.full_name || '').replace(/"/g, '""')}","'${o.phone_number || ''}","${o.province || ''}","${o.district || ''}","${(o.address || '').replace(/"/g, '""')}","${o.product || ''}","${o.size || ''}","${o.quantity || 1}","${o.total_amount || ''}","${o.status || ''}","${(o.note || '').replace(/"/g, '""')}"\n`;
+        csv += `"${o.order_id || ''}","${formatDateTimeVi(o.order_time, o.order_id)}","${(o.full_name || '').replace(/"/g, '""')}","'${o.phone_number || ''}","${o.province || ''}","${o.district || ''}","${(o.address || '').replace(/"/g, '""')}","${o.product || ''}","${o.size || ''}","${o.quantity || 1}","${o.total_amount || ''}","${o.status || ''}","${(o.note || '').replace(/"/g, '""')}"\n`;
       });
 
       const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
@@ -2725,7 +2777,6 @@
       let todayRev = 0;
       let todayOrderCount = 0;
       let successCount = 0;
-      const todayStr = new Date().toLocaleDateString('vi-VN');
 
       const prodCounts = {
         'Giày Safety Cổ Cao': 0,
@@ -2741,13 +2792,25 @@
         'Đã hủy': 0
       };
 
-      // 7 ngày qua
-      const last7Days = {};
+      // 7 ngày gần nhất (từ 6 ngày trước đến hôm nay)
+      const now = new Date();
+      const todayYear = now.getFullYear();
+      const todayMonth = now.getMonth();
+      const todayDate = now.getDate();
+
+      const last7DaysList = [];
       for (let i = 6; i >= 0; i--) {
-        const d = new Date();
-        d.setDate(d.getDate() - i);
-        const key = d.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit' });
-        last7Days[key] = 0;
+        const slotDate = new Date(todayYear, todayMonth, todayDate - i);
+        const dd = String(slotDate.getDate()).padStart(2, '0');
+        const mm = String(slotDate.getMonth() + 1).padStart(2, '0');
+        last7DaysList.push({
+          year: slotDate.getFullYear(),
+          month: slotDate.getMonth(),
+          date: slotDate.getDate(),
+          label: `${dd}-${mm}`,
+          revenue: 0,
+          ordersCount: 0
+        });
       }
 
       // Đếm trạng thái đơn hàng trên toàn bộ ordersData
@@ -2780,16 +2843,24 @@
         else if (o.product && o.product.includes('Hammer')) prodCounts['Giày Thể Thao Hammer']++;
         else prodCounts['Giày Safety Cổ Thấp']++;
 
-        // Today revenue
-        if (o.order_time && o.order_time.includes(todayStr)) {
-          todayRev += num;
-          todayOrderCount++;
-        }
+        // Khớp thời gian đơn hàng vào Doanh thu hôm nay & Biểu đồ 7 ngày
+        const oDate = parseOrderDate(o);
+        if (oDate) {
+          const oYear = oDate.getFullYear();
+          const oMonth = oDate.getMonth();
+          const oDay = oDate.getDate();
 
-        // Match date 7 days
-        for (const k in last7Days) {
-          if (o.order_time && o.order_time.includes(k)) {
-            last7Days[k] += num;
+          if (oYear === todayYear && oMonth === todayMonth && oDay === todayDate) {
+            todayRev += num;
+            todayOrderCount++;
+          }
+
+          for (const slot of last7DaysList) {
+            if (slot.year === oYear && slot.month === oMonth && slot.date === oDay) {
+              slot.revenue += num;
+              slot.ordersCount++;
+              break;
+            }
           }
         }
       });
@@ -2813,21 +2884,26 @@
 
       // Render 7-day bar chart
       const chartEl = document.getElementById('revenueBarChart');
-      chartEl.innerHTML = '';
-      const maxVal = Math.max(...Object.values(last7Days), 1000000);
+      if (chartEl) {
+        chartEl.innerHTML = '';
+        const revenues = last7DaysList.map(s => s.revenue);
+        const maxVal = Math.max(...revenues, 1000000);
 
-      for (const day in last7Days) {
-        const val = last7Days[day];
-        const pct = Math.max(Math.round((val / maxVal) * 100), 4);
+        last7DaysList.forEach(slot => {
+          const val = slot.revenue;
+          const pct = Math.max(Math.round((val / maxVal) * 100), 4);
+          const hasRev = val > 0;
+          const isToday = (slot.date === todayDate && slot.month === todayMonth && slot.year === todayYear);
 
-        const wrap = document.createElement('div');
-        wrap.className = 'chart-bar-wrap';
-        wrap.innerHTML = `
-          <div class="chart-bar-val">${val > 0 ? (val >= 1000000 ? (val/1000000).toFixed(1) + 'tr' : (val/1000).toFixed(0) + 'k') : '0'}</div>
-          <div class="chart-bar" style="height:${pct}%;" title="${day}: ${val.toLocaleString('vi-VN')}đ"></div>
-          <div class="chart-bar-label">${day}</div>
-        `;
-        chartEl.appendChild(wrap);
+          const wrap = document.createElement('div');
+          wrap.className = 'chart-bar-wrap';
+          wrap.innerHTML = `
+            <div class="chart-bar-val" style="${hasRev ? 'color: var(--gold-primary); font-weight: 800; font-size: 11px;' : 'color: var(--text-dim);'}">${hasRev ? (val >= 1000000 ? (val/1000000).toFixed(1) + 'tr' : (val/1000).toFixed(0) + 'k') : '0'}</div>
+            <div class="chart-bar" style="height:${pct}%; ${hasRev ? 'background: linear-gradient(180deg, #FFC400 0%, #d97706 100%); box-shadow: 0 0 10px rgba(255, 196, 0, 0.4);' : 'background: rgba(255, 255, 255, 0.08);'}" title="${slot.label}: ${val.toLocaleString('vi-VN')}đ (${slot.ordersCount} đơn hợp lệ)"></div>
+            <div class="chart-bar-label" style="${isToday ? 'color: var(--gold-primary); font-weight: 700;' : ''}">${slot.label}${isToday ? ' (Nay)' : ''}</div>
+          `;
+          chartEl.appendChild(wrap);
+        });
       }
 
       // Render product breakdown
@@ -3184,8 +3260,12 @@ function getOrdersJson_() {
   const list = [];
   for (let i = 1; i < rows.length; i++) {
     const r = rows[i];
+    let timeVal = r[0];
+    if (timeVal instanceof Date) {
+      timeVal = Utilities.formatDate(timeVal, "GMT+7", "dd/MM/yyyy HH:mm:ss");
+    }
     list.push({
-      order_time: r[0], order_id: r[1], full_name: r[2], phone_number: r[3],
+      order_time: timeVal, order_id: r[1], full_name: r[2], phone_number: r[3],
       province: r[4], district: r[5], address: r[6], product: r[7], size: r[8],
       quantity: r[9], price: r[10], total_amount: r[11], status: r[12], note: r[13]
     });
