@@ -1151,7 +1151,7 @@
             <span class="stat-icon">💰</span>
           </div>
           <div class="stat-value" id="kpiTotalRevenue">0đ</div>
-          <div class="stat-sub">Tính trên toàn bộ đơn đặt hàng</div>
+          <div class="stat-sub" id="kpiTotalRevenueSub">Doanh số thực tế (Đơn đủ thông tin)</div>
         </div>
 
         <div class="stat-card orders">
@@ -1160,7 +1160,7 @@
             <span class="stat-icon">📦</span>
           </div>
           <div class="stat-value" id="kpiTotalOrders">0</div>
-          <div class="stat-sub">Số lượng đơn tiếp nhận từ web</div>
+          <div class="stat-sub" id="kpiTotalOrdersSub">Đơn hàng hợp lệ đủ điều kiện</div>
         </div>
 
         <div class="stat-card success">
@@ -1626,6 +1626,94 @@
     </div>
   </div>
 
+  <!-- ================= MODAL CỨU ĐƠN RỚT (BỔ SUNG THÔNG TIN CHỐT SALE) ================= -->
+  <div id="rescueOrderModal" class="modal-backdrop">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">📞 Cứu Đơn Rớt: <span id="rescueModalLeadId" style="color:var(--gold-primary);"></span></h3>
+        <button class="modal-close" onclick="closeRescueModal()">✕</button>
+      </div>
+      <div class="modal-body">
+        <div style="background: rgba(245, 158, 11, 0.12); border-left: 3px solid var(--gold-primary); padding: 10px 14px; border-radius: 8px; margin-bottom: 16px; font-size: 12.5px; color: #fbbf24; line-height: 1.5;">
+          💡 <b>Quy tắc doanh số thực tế:</b> Khi gọi điện cho khách, hãy xin đầy đủ <b>Họ tên</b> và <b>Địa chỉ giao hàng</b> để hệ thống ghi nhận vào Doanh số thực tế!
+        </div>
+        <input type="hidden" id="rescueLeadIndex">
+        
+        <div class="modal-row">
+          <div class="setting-group">
+            <label>HỌ VÀ TÊN KHÁCH HÀNG *</label>
+            <input type="text" id="rescueFullName" class="setting-input" placeholder="Nhập họ tên khách hàng" required>
+          </div>
+          <div class="setting-group">
+            <label>SỐ ĐIỆN THOẠI *</label>
+            <input type="text" id="rescuePhone" class="setting-input" placeholder="09xxxxxxxx" required>
+          </div>
+        </div>
+
+        <div class="modal-row">
+          <div class="setting-group">
+            <label>TỈNH / THÀNH PHỐ *</label>
+            <input type="text" id="rescueProvince" class="setting-input" placeholder="Hà Nội, Hưng Yên, Hải Phòng...">
+          </div>
+          <div class="setting-group">
+            <label>QUẬN / HUYỆN</label>
+            <input type="text" id="rescueDistrict" class="setting-input" placeholder="Quận / Huyện">
+          </div>
+        </div>
+
+        <div class="setting-group">
+          <label>ĐỊA CHỈ CHI TIẾT (SỐ NHÀ / ĐƯỜNG / THÔN XÓM) *</label>
+          <input type="text" id="rescueAddress" class="setting-input" placeholder="Ví dụ: Số 12 ngõ 34 đường Giải Phóng..." required>
+        </div>
+
+        <div class="modal-row">
+          <div class="setting-group">
+            <label>SẢN PHẨM KHÁCH MUA</label>
+            <select id="rescueProduct" class="setting-input" onchange="recalcRescueTotal()">
+              <option value="Giày Safety Cổ Cao">Giày Safety Cổ Cao (399.000đ)</option>
+              <option value="Giày Safety Cổ Thấp">Giày Safety Cổ Thấp (329.000đ)</option>
+              <option value="Giày Thể Thao Hammer">Giày Thể Thao Hammer (329.000đ)</option>
+            </select>
+          </div>
+          <div class="setting-group">
+            <label>SIZE GIÀY</label>
+            <select id="rescueSize" class="setting-input">
+              <option value="38">Size 38</option>
+              <option value="39">Size 39</option>
+              <option value="40" selected>Size 40</option>
+              <option value="41">Size 41</option>
+              <option value="42">Size 42</option>
+              <option value="43">Size 43</option>
+              <option value="44">Size 44</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="modal-row">
+          <div class="setting-group">
+            <label>SỐ LƯỢNG (ĐÔI)</label>
+            <input type="number" id="rescueQuantity" class="setting-input" min="1" value="1" oninput="recalcRescueTotal()">
+          </div>
+          <div class="setting-group">
+            <label>TỔNG TIỀN THANH TOÁN (VNĐ)</label>
+            <input type="text" id="rescueTotalAmount" class="setting-input" style="color:var(--danger);font-weight:700;">
+          </div>
+        </div>
+
+        <div class="setting-group">
+          <label>GHI CHÚ KHI GỌI CHỐT</label>
+          <textarea id="rescueNote" class="setting-input" rows="2" placeholder="Ghi chú: Khách hẹn giao giờ hành chính, bọc kỹ..."></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button onclick="closeRescueModal()" class="btn-action">Hủy Bỏ</button>
+        <button onclick="submitRescueLead()" class="btn-action btn-primary" style="background:linear-gradient(135deg,#22c55e,#16a34a);border-color:#16a34a;color:#fff;font-weight:700;">
+          ✓ Xác Nhận Đã Chốt &amp; Tính Vào Doanh Số
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- Toast Message -->
   <div id="toastMsg">✓ Thông báo</div>
 
@@ -1837,6 +1925,48 @@
       document.getElementById('count-cancelled').textContent = xCount;
     }
 
+    // Kiểm tra đơn hàng có đầy đủ thông tin hợp lệ để tính vào doanh số thực tế
+    function isOrderCompleteInfo(o) {
+      if (!o) return false;
+      const st = (o.status || '').trim();
+
+      // 1. Không tính đơn hủy
+      if (st === 'Đã hủy' || st === 'Hủy') return false;
+
+      // 2. Họ và tên: Phải có ít nhất 2 ký tự và không phải placeholder mặc định
+      const name = (o.full_name || '').trim();
+      if (!name || name.length < 2) return false;
+      const lowerName = name.toLowerCase();
+      if (['khách hàng', 'khách chưa nhập tên', 'khách chưa điền họ tên', 'chưa có tên', 'null', 'undefined', 'test'].includes(lowerName)) {
+        return false;
+      }
+
+      // 3. Số điện thoại: Phải có ít nhất 9 số, không phải toàn 0
+      const cleanPhone = (o.phone_number || '').toString().replace(/[^0-9]/g, '');
+      if (!cleanPhone || cleanPhone.length < 9 || /^0+$/.test(cleanPhone)) return false;
+
+      // 4. Địa chỉ giao hàng: Phải có địa chỉ chi tiết HOẶC tỉnh/thành phố
+      const addr = (o.address || '').trim();
+      const prov = (o.province || '').trim();
+      const dist = (o.district || '').trim();
+      if (!addr && !prov && !dist) return false;
+
+      // 5. Trường hợp đơn rớt (order_id bắt đầu bằng ROT- hoặc có cờ lead):
+      // Chỉ khi gọi đầy đủ thông tin và chốt đơn mới được tính vào doanh số thực tế
+      const isRot = (o.order_id && o.order_id.startsWith('ROT-')) || o.is_partial_lead;
+      if (isRot) {
+        const rescuedStatuses = ['Đã gọi chốt', 'Đang giao', 'Thành công', 'Đã cứu'];
+        if (!rescuedStatuses.includes(st)) return false;
+        // Đơn rớt khi cứu phải có địa chỉ chi tiết rõ ràng
+        if (!addr && !prov) return false;
+      } else {
+        // Đơn DH thông thường nếu ở trạng thái Chưa gọi hoặc Không nghe thì không tính
+        if (st === 'Chưa gọi' || st === 'Không nghe') return false;
+      }
+
+      return true;
+    }
+
     // Render Table
     function renderOrdersTable() {
       const tbody = document.getElementById('ordersTableBody');
@@ -1882,6 +2012,31 @@
         else if (order.status === 'Đã hủy') statusClass = 'cancelled';
 
         const cleanPhone = (order.phone_number || '').replace(/[^0-9]/g, '');
+        const isComplete = isOrderCompleteInfo(order);
+
+        let revTag = `<span style="display:inline-block;margin-top:3px;font-size:10.5px;color:#10b981;font-weight:600;">✓ Tính doanh số</span>`;
+        let priceColor = 'var(--gold-primary)';
+        let priceDecor = 'none';
+
+        if (order.status === 'Đã hủy') {
+          revTag = `<span style="display:inline-block;margin-top:3px;font-size:10.5px;color:#ef4444;font-weight:600;">✕ Đã hủy (Không tính)</span>`;
+          priceColor = '#94a3b8';
+          priceDecor = 'line-through';
+        } else if (!isComplete) {
+          revTag = `<span style="display:inline-block;margin-top:3px;font-size:10.5px;color:#f59e0b;font-weight:600;" title="Chưa đủ thông tin tên hoặc địa chỉ. Bấm nút sửa ✏️ để bổ sung">⚠️ Chưa đủ TT (Chưa tính)</span>`;
+          priceColor = '#f59e0b';
+        }
+
+        const hasLocation = (order.address && order.address.trim()) || (order.province && order.province.trim());
+        const addressHtml = hasLocation
+          ? `<div style="font-size:12.5px;max-width:240px;line-height:1.4;">${order.address || ''}${order.district ? ', ' + order.district : ''}${order.province ? ', ' + order.province : ''}</div>`
+          : `<span style="color:#f59e0b;font-style:italic;font-size:12px;">⚠️ Chưa có địa chỉ (Cần gọi hỏi khách)</span>`;
+
+        const rawName = (order.full_name || '').trim();
+        const isPlaceholderName = !rawName || rawName.length < 2 || ['khách hàng', 'khách chưa nhập tên', 'khách chưa điền họ tên', 'chưa có tên', 'null'].includes(rawName.toLowerCase());
+        const custNameHtml = isPlaceholderName
+          ? `<span class="cust-name" style="color:#f59e0b;">${rawName || 'Khách chưa có tên'}</span>`
+          : `<span class="cust-name">${rawName}</span>`;
 
         tr.innerHTML = `
           <td>
@@ -1890,7 +2045,7 @@
           </td>
           <td>
             <div class="cust-info-box">
-              <span class="cust-name">${order.full_name || 'Khách hàng'}</span>
+              ${custNameHtml}
               <div class="cust-phone">
                 <span>${order.phone_number || ''}</span>
                 ${cleanPhone ? `
@@ -1901,9 +2056,7 @@
             </div>
           </td>
           <td>
-            <div style="font-size:12.5px;max-width:240px;line-height:1.4;">
-              ${order.address || ''}${order.district ? ', ' + order.district : ''}${order.province ? ', ' + order.province : ''}
-            </div>
+            ${addressHtml}
             ${order.note ? `<div style="font-size:11px;color:var(--gold-primary);margin-top:2px;">📝 ${order.note}</div>` : ''}
           </td>
           <td>
@@ -1913,7 +2066,8 @@
             </div>
           </td>
           <td>
-            <div class="price-amount">${order.total_amount || order.price || '329.000đ'}</div>
+            <div class="price-amount" style="color:${priceColor};text-decoration:${priceDecor};font-weight:700;">${order.total_amount || order.price || '329.000đ'}</div>
+            ${revTag}
           </td>
           <td>
             <select class="setting-input" style="padding:4px 8px;font-size:12px;width:auto;" onchange="changeOrderStatus(${realIndex}, this.value)">
@@ -1926,7 +2080,7 @@
           </td>
           <td>
             <div class="row-actions">
-              <button onclick="openEditModal(${realIndex})" class="btn-icon" title="Chỉnh sửa đơn">✏️</button>
+              <button onclick="openEditModal(${realIndex})" class="btn-icon" title="Chỉnh sửa đơn / Bổ sung thông tin">✏️</button>
             </div>
           </td>
         `;
@@ -2125,32 +2279,14 @@
       const raw = localStorage.getItem(STORAGE_KEY_ABANDONED);
       if (raw) {
         try {
-          abandonedData = JSON.parse(raw);
+          abandonedData = JSON.parse(raw).filter(o => !o.order_id || (!o.order_id.includes('DEMO') && !o.order_id.includes('RESC1')));
         } catch(e) {
           abandonedData = [];
         }
       } else {
-        // Mẫu đơn rớt demo nếu chưa có đơn nào
-        abandonedData = [
-          {
-            order_id: 'ROT-261117-RESC1',
-            order_time: '17/11/2026 16:40:12',
-            full_name: 'Nguyễn Văn Minh',
-            phone_number: '0978654321',
-            province: 'Hà Nội',
-            district: 'Nam Từ Liêm',
-            address: 'Tòa Landmark 72',
-            product: 'Giày Safety Cổ Thấp',
-            size: '41',
-            quantity: 2,
-            price: '329.000đ',
-            total_amount: '599.000đ',
-            status: 'Chưa gọi',
-            note: 'Khách điền SĐT rồi thoát trang (Cần gọi lại gấp!)'
-          }
-        ];
-        localStorage.setItem(STORAGE_KEY_ABANDONED, JSON.stringify(abandonedData));
+        abandonedData = [];
       }
+      localStorage.setItem(STORAGE_KEY_ABANDONED, JSON.stringify(abandonedData));
     }
 
     function saveAbandonedOrders() {
@@ -2168,7 +2304,7 @@
       let pending = 0, rescued = 0, missed = 0, cancelled = 0;
       abandonedData.forEach(o => {
         if (o.status === 'Chưa gọi') pending++;
-        else if (o.status === 'Đã cứu') rescued++;
+        else if (o.status === 'Đã cứu' || o.status === 'Đã tự đặt đơn') rescued++;
         else if (o.status === 'Không nghe') missed++;
         else if (o.status === 'Hủy') cancelled++;
       });
@@ -2215,6 +2351,19 @@
         const realIndex = abandonedData.findIndex(o => o.order_id === lead.order_id);
         const cleanPhone = (lead.phone_number || '').replace(/[^0-9]/g, '');
 
+        let actionBtnHtml = '';
+        if (lead.status === 'Đã tự đặt đơn') {
+          actionBtnHtml = `<span style="font-size:11.5px;color:#38bdf8;font-weight:700;">✓ Khách đã tự mua</span>`;
+        } else if (lead.status === 'Đã cứu') {
+          actionBtnHtml = `<span style="font-size:11.5px;color:#22c55e;font-weight:700;">✓ Đã cứu thành công</span>`;
+        } else {
+          actionBtnHtml = `
+            <button onclick="openRescueLeadModal(${realIndex})" class="btn-action" style="padding:5px 10px;font-size:12px;white-space:nowrap;background:linear-gradient(135deg,#22c55e,#16a34a);border-color:#16a34a;color:#fff;font-weight:700;display:flex;align-items:center;gap:4px;" title="Gọi khách & cứu đơn">
+              <span style="font-size:13px;">📞</span> Cứu Đơn
+            </button>
+          `;
+        }
+
         const tr = document.createElement('tr');
         tr.innerHTML = `
           <td>
@@ -2253,12 +2402,13 @@
               <option value="Chưa gọi" ${lead.status === 'Chưa gọi' ? 'selected' : ''}>🔴 Chưa gọi</option>
               <option value="Đã cứu" ${lead.status === 'Đã cứu' ? 'selected' : ''}>🟢 Đã cứu thành công</option>
               <option value="Không nghe" ${lead.status === 'Không nghe' ? 'selected' : ''}>🟡 Không nghe máy</option>
+              <option value="Đã tự đặt đơn" ${lead.status === 'Đã tự đặt đơn' ? 'selected' : ''}>🔵 Đã tự đặt đơn</option>
               <option value="Hủy" ${lead.status === 'Hủy' ? 'selected' : ''}>⚫ Bỏ qua / Hủy</option>
             </select>
           </td>
           <td>
             <div style="display:flex;align-items:center;gap:6px;">
-              <button onclick="convertAbandonedToOrder(${realIndex})" class="btn-action" style="padding:4px 8px;font-size:11.5px;white-space:nowrap;background:linear-gradient(135deg,#22c55e,#16a34a);border-color:#16a34a;color:#fff;" title="Chuyển thành đơn thật">✓ Cứu thành công</button>
+              ${actionBtnHtml}
             </div>
           </td>
         `;
@@ -2286,42 +2436,130 @@
       }
     }
 
-    function convertAbandonedToOrder(index) {
+    // Modal Cứu Đơn Rớt
+    function openRescueLeadModal(index) {
       const lead = abandonedData[index];
       if (!lead) return;
 
-      if (confirm(`Chuyển khách [${lead.full_name}] (${lead.phone_number}) thành đơn hàng chính thức để xử lý và giao hàng?`)) {
-        const now = new Date();
-        const dateStr = now.toISOString().slice(2, 10).replace(/-/g, '');
-        const randStr = Math.random().toString(36).substring(2, 6).toUpperCase();
-        const officialOrderId = `DH-${dateStr}-${randStr}`;
+      document.getElementById('rescueLeadIndex').value = index;
+      document.getElementById('rescueModalLeadId').textContent = lead.order_id || 'Đơn rớt';
+      document.getElementById('rescueFullName').value = (lead.full_name && !lead.full_name.includes('chưa') && !lead.full_name.includes('Khách hàng')) ? lead.full_name : '';
+      document.getElementById('rescuePhone').value = lead.phone_number || '';
+      document.getElementById('rescueProvince').value = lead.province || '';
+      document.getElementById('rescueDistrict').value = lead.district || '';
+      document.getElementById('rescueAddress').value = lead.address || '';
+      document.getElementById('rescueProduct').value = lead.product || 'Giày Safety Cổ Thấp';
+      document.getElementById('rescueSize').value = lead.size || '40';
+      document.getElementById('rescueQuantity').value = lead.quantity || 1;
+      document.getElementById('rescueTotalAmount').value = lead.total_amount || lead.price || '329.000đ';
+      document.getElementById('rescueNote').value = lead.note || '';
 
-        const newOrder = {
-          order_id: officialOrderId,
-          order_time: now.toLocaleString('vi-VN', { timeZone: 'Asia/Ho_Chi_Minh' }),
-          full_name: lead.full_name || 'Khách hàng',
-          phone_number: lead.phone_number,
-          province: lead.province || '',
-          district: lead.district || '',
-          address: lead.address || '',
-          product: lead.product || 'Giày Safety Cổ Thấp',
-          size: lead.size || '40',
-          quantity: lead.quantity || 1,
-          price: lead.price || '329.000đ',
-          total_amount: lead.total_amount || '329.000đ',
-          status: 'Đã gọi chốt',
-          note: '🎉 Cứu đơn thành công từ Đơn Rớt (' + (lead.order_id || '') + ')'
-        };
+      document.getElementById('rescueOrderModal').style.display = 'flex';
+    }
 
-        ordersData.push(newOrder);
-        saveOrders();
+    function closeRescueModal() {
+      document.getElementById('rescueOrderModal').style.display = 'none';
+    }
 
-        lead.status = 'Đã cứu';
-        saveAbandonedOrders();
+    function recalcRescueTotal() {
+      const product = document.getElementById('rescueProduct').value;
+      const qty = parseInt(document.getElementById('rescueQuantity').value) || 1;
+      let unitPrice = 329000;
+      if (product.includes('Cổ Cao')) unitPrice = 399000;
 
-        showToast(`🎉 Tuyệt vời! Đã cứu thành công đơn của khách ${lead.full_name} (${officialOrderId})!`);
-        switchTab('orders');
+      let total = unitPrice * qty;
+      if (qty === 2) total -= 60000;
+      else if (qty >= 3 && qty <= 9) total = (unitPrice - 50000) * qty;
+      else if (qty >= 10) total = (product.includes('Cổ Cao') ? 290000 : 250000) * qty;
+
+      document.getElementById('rescueTotalAmount').value = total.toLocaleString('vi-VN') + 'đ';
+    }
+
+    function submitRescueLead() {
+      const index = parseInt(document.getElementById('rescueLeadIndex').value);
+      const lead = abandonedData[index];
+      if (isNaN(index) || !lead) return;
+
+      const fullName = document.getElementById('rescueFullName').value.trim();
+      const phone = document.getElementById('rescuePhone').value.trim();
+      const province = document.getElementById('rescueProvince').value.trim();
+      const district = document.getElementById('rescueDistrict').value.trim();
+      const address = document.getElementById('rescueAddress').value.trim();
+      const product = document.getElementById('rescueProduct').value;
+      const size = document.getElementById('rescueSize').value;
+      const quantity = parseInt(document.getElementById('rescueQuantity').value) || 1;
+      const totalAmount = document.getElementById('rescueTotalAmount').value.trim();
+      const note = document.getElementById('rescueNote').value.trim();
+
+      if (!fullName || fullName.length < 2) {
+        alert('Vui lòng nhập Họ và Tên khách hàng khi gọi xác nhận!');
+        document.getElementById('rescueFullName').focus();
+        return;
       }
+
+      const cleanPhone = phone.replace(/[^0-9]/g, '');
+      if (!cleanPhone || cleanPhone.length < 9) {
+        alert('Số điện thoại không hợp lệ (tối thiểu 9-10 chữ số)!');
+        document.getElementById('rescuePhone').focus();
+        return;
+      }
+
+      if (!address && !province) {
+        alert('Vui lòng nhập Địa chỉ chi tiết hoặc Tỉnh / Thành phố để đơn hàng đủ điều kiện tính vào Doanh số thực tế!');
+        document.getElementById('rescueAddress').focus();
+        return;
+      }
+
+      const now = new Date();
+      const dateCode = now.toISOString().slice(2, 10).replace(/-/g, '');
+      const randStr = Math.random().toString(36).substring(2, 6).toUpperCase();
+      const officialOrderId = `DH-${dateCode}-${randStr}`;
+
+      const newOrder = {
+        order_id: officialOrderId,
+        order_time: now.toLocaleString('vi-VN', { timeZone: 'Asia/Ho_Chi_Minh' }),
+        full_name: fullName,
+        phone_number: phone,
+        province: province,
+        district: district,
+        address: address,
+        product: product,
+        size: size,
+        quantity: quantity,
+        price: product.includes('Cổ Cao') ? '399.000đ' : '329.000đ',
+        total_amount: totalAmount,
+        status: 'Đã gọi chốt',
+        note: `🎉 Cứu đơn thành công từ Đơn Rớt (${lead.order_id || ''})${note ? ' | ' + note : ''}`
+      };
+
+      ordersData.push(newOrder);
+      saveOrders();
+
+      lead.status = 'Đã cứu';
+      lead.full_name = fullName;
+      lead.address = address;
+      lead.province = province;
+      saveAbandonedOrders();
+
+      // Đẩy đơn mới lên Google Sheet để đồng bộ tức thì
+      const config = JSON.parse(localStorage.getItem(STORAGE_KEY_CONFIG) || '{}');
+      const scriptUrl = config.appsScriptUrl || DEFAULT_APPS_SCRIPT_URL;
+      if (scriptUrl && scriptUrl.startsWith('http')) {
+        fetch(scriptUrl, {
+          method: 'POST',
+          mode: 'no-cors',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify(newOrder)
+        }).catch(() => {});
+      }
+
+      closeRescueModal();
+      showToast(`🎉 Tuyệt vời! Đã cứu thành công đơn cho khách ${fullName} (${officialOrderId}) và cộng ${totalAmount} vào doanh số thực tế!`);
+      switchTab('orders');
+    }
+
+    function convertAbandonedToOrder(index) {
+      openRescueLeadModal(index);
     }
 
     function confirmDeleteAbandoned(index) {
@@ -2361,6 +2599,7 @@
     function updateDashboardKPIs() {
       let totalRev = 0;
       let todayRev = 0;
+      let todayOrderCount = 0;
       let successCount = 0;
       const todayStr = new Date().toLocaleDateString('vi-VN');
 
@@ -2387,17 +2626,29 @@
         last7Days[key] = 0;
       }
 
+      // Đếm trạng thái đơn hàng trên toàn bộ ordersData
       ordersData.forEach(o => {
+        if (statusCounts[o.status] !== undefined) {
+          statusCounts[o.status]++;
+        }
+      });
+
+      // LỌC DANH SÁCH ĐƠN HỢP LỆ ĐỦ THÔNG TIN ĐỂ TÍNH DOANH SỐ THỰC TẾ
+      // Chỉ tính đơn:
+      // 1. Họ tên hợp lệ (>=2 ký tự, không phải placeholder)
+      // 2. SĐT hợp lệ (>=9 số)
+      // 3. Có địa chỉ chi tiết hoặc tỉnh/thành
+      // 4. Không bị hủy (status !== 'Đã hủy' & !== 'Hủy')
+      // 5. Đơn rớt (ROT-) chỉ tính khi đã gọi chốt/cứu và bổ sung đầy đủ thông tin
+      const validOrders = ordersData.filter(isOrderCompleteInfo);
+
+      validOrders.forEach(o => {
         // Parse money
-        const num = parseInt((o.total_amount || '0').replace(/[^0-9]/g, '')) || 0;
+        const num = parseInt((o.total_amount || o.price || '0').replace(/[^0-9]/g, '')) || 0;
         totalRev += num;
 
         if (o.status === 'Thành công' || o.status === 'Đã gọi chốt') {
           successCount++;
-        }
-
-        if (statusCounts[o.status] !== undefined) {
-          statusCounts[o.status]++;
         }
 
         // Product count
@@ -2408,6 +2659,7 @@
         // Today revenue
         if (o.order_time && o.order_time.includes(todayStr)) {
           todayRev += num;
+          todayOrderCount++;
         }
 
         // Match date 7 days
@@ -2420,11 +2672,18 @@
 
       // Update Top KPIs
       document.getElementById('kpiTotalRevenue').textContent = totalRev.toLocaleString('vi-VN') + 'đ';
-      document.getElementById('kpiTotalOrders').textContent = ordersData.length;
+      document.getElementById('kpiTotalOrders').textContent = validOrders.length;
+      const subOrdersEl = document.getElementById('kpiTotalOrdersSub');
+      if (subOrdersEl) subOrdersEl.textContent = `${validOrders.length} đơn đủ điều kiện (${ordersData.length} tổng tiếp nhận)`;
+
       document.getElementById('kpiSuccessOrders').textContent = successCount;
-      const rate = ordersData.length > 0 ? Math.round((successCount / ordersData.length) * 100) : 0;
+      const rate = validOrders.length > 0 ? Math.round((successCount / validOrders.length) * 100) : 0;
       document.getElementById('kpiConversionRate').textContent = `Tỉ lệ chốt: ${rate}%`;
+
       document.getElementById('kpiTodayRevenue').textContent = todayRev.toLocaleString('vi-VN') + 'đ';
+      const todaySubEl = document.getElementById('kpiTodayOrders');
+      if (todaySubEl) todaySubEl.textContent = `${todayOrderCount} đơn hợp lệ hôm nay`;
+
       const kpiAbandoned = document.getElementById('kpiAbandonedOrders');
       if (kpiAbandoned) kpiAbandoned.textContent = abandonedData.length;
 
@@ -2567,10 +2826,52 @@
         const res = await fetch(url + (url.includes('?') ? '&' : '?') + 'action=getOrders&t=' + Date.now());
         const json = await res.json();
         if (json && json.status === 'success' && Array.isArray(json.orders)) {
-          // Lọc sạch triệt để mọi đơn demo cũ và chỉ giữ lại đơn hàng thật từ Google Sheets
-          ordersData = json.orders.filter(o => !o.order_id || !o.order_id.includes('DEMO'));
+          // Lọc sạch triệt để mọi đơn demo cũ
+          const rawOrders = json.orders.filter(o => !o.order_id || (!o.order_id.includes('DEMO') && !o.order_id.includes('RESC1')));
+
+          const officialList = [];
+          const rotList = [];
+
+          rawOrders.forEach(item => {
+            const id = (item.order_id || '').trim();
+            const isRot = id.startsWith('ROT-') || item.is_partial_lead;
+            const st = (item.status || '').trim();
+
+            if (isRot) {
+              const isRescued = ['Đã gọi chốt', 'Đang giao', 'Thành công', 'Đã cứu'].includes(st);
+              // Đơn rớt chỉ được đưa vào đơn hàng chính thức khi đã cứu chốt và có đầy đủ thông tin
+              if (isRescued && isOrderCompleteInfo(item)) {
+                officialList.push(item);
+              }
+              rotList.push(item);
+            } else {
+              officialList.push(item);
+            }
+          });
+
+          // Tự động nhận diện nếu khách để lại SĐT đơn rớt nhưng sau đó đã tự đặt đơn hàng chính thức
+          const officialPhones = new Set(
+            officialList.map(o => (o.phone_number || '').replace(/[^0-9]/g, '')).filter(p => p.length >= 9)
+          );
+
+          rotList.forEach(lead => {
+            const p = (lead.phone_number || '').replace(/[^0-9]/g, '');
+            if (p && officialPhones.has(p) && lead.status === 'Chưa gọi') {
+              const matched = officialList.find(o => (o.phone_number || '').replace(/[^0-9]/g, '') === p);
+              lead.status = 'Đã tự đặt đơn';
+              if (matched) {
+                lead.note = (lead.note ? lead.note + ' | ' : '') + `Khách đã hoàn tất đơn (${matched.order_id})`;
+              }
+            }
+          });
+
+          ordersData = officialList;
+          abandonedData = rotList;
+
           saveOrders();
-          showToast(`✓ Đã đồng bộ thành công ${ordersData.length} đơn hàng từ Google Sheets!`);
+          saveAbandonedOrders();
+
+          showToast(`✓ Đã đồng bộ ${ordersData.length} đơn hàng & ${abandonedData.length} đơn rớt từ Google Sheets!`);
         } else {
           showToast('✓ Đã kết nối Google Sheets (Đang cập nhật dữ liệu)');
         }
