@@ -1967,6 +1967,33 @@
       return true;
     }
 
+    // Định dạng màu sắc và viền cho dropdown trạng thái
+    function getStatusSelectStyle(status) {
+      let border = '#eab308';
+      let bg = 'rgba(234, 179, 8, 0.15)';
+      let color = '#fef08a';
+
+      if (status === 'Đã gọi chốt') {
+        border = '#0284c7';
+        bg = 'rgba(2, 132, 199, 0.18)';
+        color = '#38bdf8';
+      } else if (status === 'Đang giao') {
+        border = '#a855f7';
+        bg = 'rgba(168, 85, 247, 0.18)';
+        color = '#c084fc';
+      } else if (status === 'Thành công') {
+        border = '#16a34a';
+        bg = 'rgba(22, 163, 74, 0.18)';
+        color = '#4ade80';
+      } else if (status === 'Đã hủy') {
+        border = '#ef4444';
+        bg = 'rgba(239, 68, 68, 0.18)';
+        color = '#f87171';
+      }
+
+      return `min-width: 145px; padding: 6px 10px; font-size: 12.5px; font-weight: 700; border-radius: 8px; border: 1.5px solid ${border}; background-color: ${bg}; color: ${color}; cursor: pointer; outline: none; transition: all 0.2s;`;
+    }
+
     // Render Table
     function renderOrdersTable() {
       const tbody = document.getElementById('ordersTableBody');
@@ -2070,7 +2097,7 @@
             ${revTag}
           </td>
           <td>
-            <select class="setting-input" style="padding:4px 8px;font-size:12px;width:auto;" onchange="changeOrderStatus(${realIndex}, this.value)">
+            <select class="setting-input status-dropdown" data-order-id="${order.order_id}" style="${getStatusSelectStyle(order.status)}" onchange="changeOrderStatus('${order.order_id}', this.value, this)">
               <option value="Chờ xác nhận" ${order.status === 'Chờ xác nhận' ? 'selected' : ''}>🟡 Chờ xác nhận</option>
               <option value="Đã gọi chốt" ${order.status === 'Đã gọi chốt' ? 'selected' : ''}>🔵 Đã gọi chốt</option>
               <option value="Đang giao" ${order.status === 'Đang giao' ? 'selected' : ''}>🟣 Đang giao</option>
@@ -2080,7 +2107,7 @@
           </td>
           <td>
             <div class="row-actions">
-              <button onclick="openEditModal(${realIndex})" class="btn-icon" title="Chỉnh sửa đơn / Bổ sung thông tin">✏️</button>
+              <button onclick="openEditModal('${order.order_id}')" class="btn-icon" title="Chỉnh sửa đơn / Bổ sung thông tin">✏️</button>
             </div>
           </td>
         `;
@@ -2089,12 +2116,79 @@
       });
     }
 
-    // Change status
-    function changeOrderStatus(index, newStatus) {
-      if (ordersData[index]) {
-        ordersData[index].status = newStatus;
-        saveOrders();
-        showToast(`✓ Đã cập nhật trạng thái đơn ${ordersData[index].order_id}: ${newStatus}`);
+    const STORAGE_KEY_STATUS_OVERRIDES = 'giaythethao_status_overrides';
+
+    // Đổi trạng thái đơn hàng trực tiếp
+    function changeOrderStatus(orderId, newStatus, selectEl) {
+      if (!orderId) return;
+
+      const order = ordersData.find(o => (o.order_id || '').trim() === (orderId || '').trim());
+      if (!order) return;
+
+      order.status = newStatus;
+
+      // 1. Lưu ghi đè trạng thái vào localStorage để KHÔNG BAO GIỜ BỊ MẤT kể cả khi tải lại trang
+      const statusOverrides = JSON.parse(localStorage.getItem(STORAGE_KEY_STATUS_OVERRIDES) || '{}');
+      statusOverrides[order.order_id] = newStatus;
+      localStorage.setItem(STORAGE_KEY_STATUS_OVERRIDES, JSON.stringify(statusOverrides));
+
+      // 2. Lưu ordersData
+      localStorage.setItem(STORAGE_KEY_ORDERS, JSON.stringify(ordersData));
+
+      // 3. Cập nhật giao diện trực tiếp trên ô select và dòng đang thao tác (không hủy DOM)
+      if (selectEl) {
+        selectEl.style.cssText = getStatusSelectStyle(newStatus);
+        selectEl.value = newStatus;
+      }
+
+      const tr = selectEl ? selectEl.closest('tr') : null;
+      if (tr) {
+        const isComplete = isOrderCompleteInfo(order);
+        const priceCell = tr.querySelector('.price-amount');
+        if (priceCell) {
+          if (newStatus === 'Đã hủy') {
+            priceCell.style.textDecoration = 'line-through';
+            priceCell.style.color = '#94a3b8';
+          } else if (isComplete) {
+            priceCell.style.textDecoration = 'none';
+            priceCell.style.color = 'var(--gold-primary)';
+          } else {
+            priceCell.style.textDecoration = 'none';
+            priceCell.style.color = '#f59e0b';
+          }
+        }
+      }
+
+      // Cập nhật số liệu KPI & bộ đếm
+      updateDashboardKPIs();
+      updateOrderCounts();
+
+      showToast(`✓ Đã đổi trạng thái đơn [${order.order_id}] sang: ${newStatus}`);
+
+      // 4. Nếu đang ở tab lọc trạng thái khác, chờ 700ms rồi ẩn dòng mượt mà
+      if (currentFilter !== 'all' && currentFilter !== newStatus) {
+        if (tr) {
+          tr.style.transition = 'opacity 0.4s ease, transform 0.4s ease';
+          tr.style.opacity = '0.3';
+        }
+        setTimeout(() => {
+          renderOrdersTable();
+        }, 700);
+      }
+
+      // 5. Gửi cập nhật trạng thái lên Google Sheet (cả POST và GET ping ngầm)
+      const config = JSON.parse(localStorage.getItem(STORAGE_KEY_CONFIG) || '{}');
+      const scriptUrl = config.appsScriptUrl || DEFAULT_APPS_SCRIPT_URL;
+      if (scriptUrl && scriptUrl.startsWith('http')) {
+        fetch(scriptUrl, {
+          method: 'POST',
+          mode: 'no-cors',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify({ action: 'updateStatus', order_id: order.order_id, status: newStatus })
+        }).catch(() => {});
+
+        const updateGetUrl = scriptUrl + (scriptUrl.includes('?') ? '&' : '?') + 'action=updateStatus&order_id=' + encodeURIComponent(order.order_id) + '&status=' + encodeURIComponent(newStatus) + '&t=' + Date.now();
+        fetch(updateGetUrl, { mode: 'no-cors' }).catch(() => {});
       }
     }
 
@@ -2117,11 +2211,19 @@
     }
 
     // Edit Order Modal
-    function openEditModal(index) {
-      const order = ordersData[index];
+    function openEditModal(indexOrId) {
+      let order = null;
+      let realIndex = -1;
+      if (typeof indexOrId === 'number') {
+        order = ordersData[indexOrId];
+        realIndex = indexOrId;
+      } else {
+        realIndex = ordersData.findIndex(o => (o.order_id || '').trim() === (indexOrId || '').trim());
+        order = ordersData[realIndex];
+      }
       if (!order) return;
 
-      document.getElementById('editOrderIndex').value = index;
+      document.getElementById('editOrderIndex').value = realIndex;
       document.getElementById('modalOrderId').textContent = order.order_id || '';
       document.getElementById('editFullName').value = order.full_name || '';
       document.getElementById('editPhone').value = order.phone_number || '';
@@ -2160,21 +2262,43 @@
       const index = parseInt(document.getElementById('editOrderIndex').value);
       if (isNaN(index) || !ordersData[index]) return;
 
-      ordersData[index].full_name = document.getElementById('editFullName').value.trim();
-      ordersData[index].phone_number = document.getElementById('editPhone').value.trim();
-      ordersData[index].province = document.getElementById('editProvince').value.trim();
-      ordersData[index].district = document.getElementById('editDistrict').value.trim();
-      ordersData[index].address = document.getElementById('editAddress').value.trim();
-      ordersData[index].product = document.getElementById('editProduct').value;
-      ordersData[index].size = document.getElementById('editSize').value;
-      ordersData[index].quantity = parseInt(document.getElementById('editQuantity').value) || 1;
-      ordersData[index].total_amount = document.getElementById('editTotalAmount').value.trim();
-      ordersData[index].status = document.getElementById('editStatus').value;
-      ordersData[index].note = document.getElementById('editNote').value.trim();
+      const order = ordersData[index];
+      order.full_name = document.getElementById('editFullName').value.trim();
+      order.phone_number = document.getElementById('editPhone').value.trim();
+      order.province = document.getElementById('editProvince').value.trim();
+      order.district = document.getElementById('editDistrict').value.trim();
+      order.address = document.getElementById('editAddress').value.trim();
+      order.product = document.getElementById('editProduct').value;
+      order.size = document.getElementById('editSize').value;
+      order.quantity = parseInt(document.getElementById('editQuantity').value) || 1;
+      order.total_amount = document.getElementById('editTotalAmount').value.trim();
+      const newStatus = document.getElementById('editStatus').value;
+      order.status = newStatus;
+      order.note = document.getElementById('editNote').value.trim();
+
+      // Lưu status overrides vào localStorage
+      const statusOverrides = JSON.parse(localStorage.getItem(STORAGE_KEY_STATUS_OVERRIDES) || '{}');
+      statusOverrides[order.order_id] = newStatus;
+      localStorage.setItem(STORAGE_KEY_STATUS_OVERRIDES, JSON.stringify(statusOverrides));
 
       saveOrders();
       closeEditModal();
-      showToast('✓ Đã cập nhật thông tin đơn hàng thành công!');
+      showToast(`✓ Đã cập nhật thông tin và trạng thái đơn [${order.order_id}] sang: ${newStatus}`);
+
+      // Gửi cập nhật trạng thái lên Google Sheet
+      const config = JSON.parse(localStorage.getItem(STORAGE_KEY_CONFIG) || '{}');
+      const scriptUrl = config.appsScriptUrl || DEFAULT_APPS_SCRIPT_URL;
+      if (scriptUrl && scriptUrl.startsWith('http')) {
+        fetch(scriptUrl, {
+          method: 'POST',
+          mode: 'no-cors',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify({ action: 'updateStatus', order_id: order.order_id, status: newStatus })
+        }).catch(() => {});
+
+        const updateGetUrl = scriptUrl + (scriptUrl.includes('?') ? '&' : '?') + 'action=updateStatus&order_id=' + encodeURIComponent(order.order_id) + '&status=' + encodeURIComponent(newStatus) + '&t=' + Date.now();
+        fetch(updateGetUrl, { mode: 'no-cors' }).catch(() => {});
+      }
     }
 
     // Add Order Modal
@@ -2829,10 +2953,36 @@
           // Lọc sạch triệt để mọi đơn demo cũ
           const rawOrders = json.orders.filter(o => !o.order_id || (!o.order_id.includes('DEMO') && !o.order_id.includes('RESC1')));
 
+          // Deduplicate gộp dữ liệu theo order_id (tránh bị nhân đôi nếu trùng dòng)
+          const deduplicatedMap = new Map();
+          rawOrders.forEach(item => {
+            const id = (item.order_id || '').trim();
+            if (!id) return;
+            if (!deduplicatedMap.has(id)) {
+              deduplicatedMap.set(id, { ...item });
+            } else {
+              const cur = deduplicatedMap.get(id);
+              if ((!cur.full_name || cur.full_name.includes('chưa')) && item.full_name) cur.full_name = item.full_name;
+              if (!cur.address && item.address) cur.address = item.address;
+              if (!cur.province && item.province) cur.province = item.province;
+              if (!cur.district && item.district) cur.district = item.district;
+              if ((!cur.phone_number || cur.phone_number.length < 9) && item.phone_number) cur.phone_number = item.phone_number;
+              if (item.status && item.status !== 'Chờ xác nhận') cur.status = item.status;
+            }
+          });
+
+          // Áp dụng trạng thái admin đã bấm đổi trong localStorage (đảm bảo không bị reset khi đồng bộ)
+          const statusOverrides = JSON.parse(localStorage.getItem(STORAGE_KEY_STATUS_OVERRIDES) || '{}');
+          deduplicatedMap.forEach((item, id) => {
+            if (statusOverrides[id]) {
+              item.status = statusOverrides[id];
+            }
+          });
+
           const officialList = [];
           const rotList = [];
 
-          rawOrders.forEach(item => {
+          deduplicatedMap.forEach(item => {
             const id = (item.order_id || '').trim();
             const isRot = id.startsWith('ROT-') || item.is_partial_lead;
             const st = (item.status || '').trim();
@@ -2906,6 +3056,9 @@ function doGet(e) {
   if (action === "getOrders") {
     return getOrdersJson_();
   }
+  if (action === "updateStatus") {
+    return updateOrderStatus_(e.parameter);
+  }
   return ContentService.createTextOutput(JSON.stringify({
     status: "online",
     message: "Google Apps Script Backend cho Giày Hùng Việt đang hoạt động!",
@@ -2927,6 +3080,9 @@ function doPost(e) {
     if (data.action === "saveConfig") {
       return saveConfig_(data.config);
     }
+    if (data.action === "updateStatus") {
+      return updateOrderStatus_(data);
+    }
 
     // Lưu đơn hàng mới
     return saveNewOrder_(data);
@@ -2938,6 +3094,28 @@ function doPost(e) {
   } finally {
     lock.releaseLock();
   }
+}
+
+function updateOrderStatus_(data) {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const sheet = ss.getSheetByName(SHEET_ORDERS_NAME);
+  if (!sheet) return ContentService.createTextOutput(JSON.stringify({ status: "error", message: "Sheet Orders không tồn tại" })).setMimeType(ContentService.MimeType.JSON);
+
+  const orderId = (data.order_id || "").toString().trim();
+  const newStatus = (data.status || "").toString().trim();
+  if (!orderId || !newStatus) {
+    return ContentService.createTextOutput(JSON.stringify({ status: "error", message: "Thiếu order_id hoặc status" })).setMimeType(ContentService.MimeType.JSON);
+  }
+
+  const values = sheet.getDataRange().getValues();
+  for (let i = 1; i < values.length; i++) {
+    if ((values[i][1] || "").toString().trim() === orderId) {
+      sheet.getRange(i + 1, 13).setValue(newStatus);
+      return ContentService.createTextOutput(JSON.stringify({ status: "success", order_id: orderId, new_status: newStatus })).setMimeType(ContentService.MimeType.JSON);
+    }
+  }
+
+  return ContentService.createTextOutput(JSON.stringify({ status: "error", message: "Không tìm thấy mã đơn " + orderId })).setMimeType(ContentService.MimeType.JSON);
 }
 
 function saveNewOrder_(data) {
