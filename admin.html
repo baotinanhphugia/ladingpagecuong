@@ -1288,7 +1288,6 @@
           </div>
           <div style="display: flex; gap: 8px;">
             <button onclick="exportAbandonedToCSV()" class="btn-action" style="font-size: 12px; padding: 6px 12px;">📥 Xuất Excel Đơn Rớt</button>
-            <button onclick="clearAllAbandoned()" class="btn-action" style="font-size: 12px; padding: 6px 12px; border-color: rgba(239, 68, 68, 0.4); color: #ef4444;">🗑️ Làm Sạch Đơn Rớt</button>
           </div>
         </div>
       </div>
@@ -1928,7 +1927,6 @@
           <td>
             <div class="row-actions">
               <button onclick="openEditModal(${realIndex})" class="btn-icon" title="Chỉnh sửa đơn">✏️</button>
-              <button onclick="confirmDeleteOrder(${realIndex})" class="btn-icon delete" title="Xóa đơn">🗑️</button>
             </div>
           </td>
         `;
@@ -1946,15 +1944,9 @@
       }
     }
 
-    // Delete order
+    // Delete order (Đã tắt theo yêu cầu quản trị để bảo vệ dữ liệu)
     function confirmDeleteOrder(index) {
-      const order = ordersData[index];
-      if (!order) return;
-      if (confirm(`Bạn có chắc chắn muốn xóa đơn hàng [${order.order_id}] của khách ${order.full_name}? Hành động này không thể hoàn tác.`)) {
-        ordersData.splice(index, 1);
-        saveOrders();
-        showToast('✓ Đã xóa đơn hàng thành công!');
-      }
+      alert('Chức năng xóa đơn hàng đã được tắt theo yêu cầu quản trị để bảo vệ an toàn dữ liệu khách hàng.');
     }
 
     // Filter status
@@ -2267,7 +2259,6 @@
           <td>
             <div style="display:flex;align-items:center;gap:6px;">
               <button onclick="convertAbandonedToOrder(${realIndex})" class="btn-action" style="padding:4px 8px;font-size:11.5px;white-space:nowrap;background:linear-gradient(135deg,#22c55e,#16a34a);border-color:#16a34a;color:#fff;" title="Chuyển thành đơn thật">✓ Cứu thành công</button>
-              <button onclick="confirmDeleteAbandoned(${realIndex})" class="btn-icon delete" title="Xóa đơn rớt">🗑️</button>
             </div>
           </td>
         `;
@@ -2334,25 +2325,11 @@
     }
 
     function confirmDeleteAbandoned(index) {
-      const lead = abandonedData[index];
-      if (!lead) return;
-      if (confirm(`Bạn có chắc chắn muốn xóa thông tin đơn rớt của khách ${lead.full_name} (${lead.phone_number})?`)) {
-        abandonedData.splice(index, 1);
-        saveAbandonedOrders();
-        showToast('✓ Đã xóa đơn rớt thành công!');
-      }
+      alert('Chức năng xóa dữ liệu đã được tắt theo yêu cầu quản trị để bảo vệ dữ liệu khách hàng.');
     }
 
     function clearAllAbandoned() {
-      if (abandonedData.length === 0) {
-        alert('Danh sách đơn rớt hiện đang trống!');
-        return;
-      }
-      if (confirm(`Bạn có chắc chắn muốn xóa TOÀN BỘ ${abandonedData.length} đơn rớt? Hành động này không thể hoàn tác!`)) {
-        abandonedData = [];
-        saveAbandonedOrders();
-        showToast('✓ Đã làm sạch toàn bộ đơn rớt!');
-      }
+      alert('Chức năng xóa dữ liệu đã được tắt theo yêu cầu quản trị để bảo vệ dữ liệu khách hàng.');
     }
 
     function exportAbandonedToCSV() {
