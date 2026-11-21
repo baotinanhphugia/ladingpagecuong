@@ -1301,12 +1301,20 @@
       </div>
 
       <!-- Filter Chips -->
-      <div class="filter-chips">
-        <button class="chip-btn active" onclick="filterAbandonedByStatus('all', this)">Tất Cả (<span id="count-abandoned-all">0</span>)</button>
-        <button class="chip-btn" onclick="filterAbandonedByStatus('Chưa gọi', this)">🔴 Chưa gọi (<span id="count-abandoned-pending">0</span>)</button>
-        <button class="chip-btn" onclick="filterAbandonedByStatus('Đã cứu', this)">🟢 Đã cứu thành công (<span id="count-abandoned-rescued">0</span>)</button>
-        <button class="chip-btn" onclick="filterAbandonedByStatus('Không nghe', this)">🟡 Không nghe máy (<span id="count-abandoned-missed">0</span>)</button>
-        <button class="chip-btn" onclick="filterAbandonedByStatus('Hủy', this)">⚫ Bỏ qua / Hủy (<span id="count-abandoned-cancelled">0</span>)</button>
+      <div class="filter-chips" style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <button class="chip-btn active" style="font-weight: 700; background: rgba(239, 68, 68, 0.15); border-color: #ef4444; color: #fca5a5;">
+            🔴 Đơn Chưa Gọi Cần Cứu (<span id="count-abandoned-pending">0</span>)
+          </button>
+          <span id="count-abandoned-all" style="display:none;">0</span>
+          <span id="count-abandoned-rescued" style="display:none;">0</span>
+          <span id="count-abandoned-missed" style="display:none;">0</span>
+          <span id="count-abandoned-cancelled" style="display:none;">0</span>
+        </div>
+        <div style="font-size: 12px; color: #94a3b8; display: flex; align-items: center; gap: 6px;">
+          <span>⚡</span>
+          <span>Chỉ đơn <b>Chưa gọi</b> mới hiển thị ở đây. Khi đổi trạng thái (Cứu thành công, Không nghe, Hủy), đơn sẽ tự động hoàn tất và ra khỏi danh sách.</span>
+        </div>
       </div>
 
       <!-- Abandoned Orders Table -->
@@ -1827,6 +1835,10 @@
       }
 
       if (tabId === 'dashboard') updateDashboardKPIs();
+      if (tabId === 'abandoned') {
+        renderAbandonedTable();
+        updateAbandonedCounts();
+      }
     }
 
     // Load & Save Config
@@ -2473,6 +2485,9 @@
           lead.status = statusOverrides[lead.order_id];
         }
       });
+      // QUAN TRỌNG: Chỉ giữ lại các đơn rớt CÒN Ở TRẠNG THÁI "Chưa gọi"
+      // Khi đã chuyển trạng thái (Đã cứu, Không nghe máy, Bỏ qua/Hủy, Đã tự đặt đơn) là biến mất luôn khỏi danh sách cần cứu!
+      abandonedData = abandonedData.filter(lead => (lead.status || 'Chưa gọi') === 'Chưa gọi');
       localStorage.setItem(STORAGE_KEY_ABANDONED, JSON.stringify(abandonedData));
     }
 
@@ -2484,23 +2499,23 @@
     }
 
     function updateAbandonedCounts() {
-      const total = abandonedData.length;
+      // Chỉ đếm những đơn rớt có trạng thái "Chưa gọi"
+      const pending = abandonedData.filter(o => (o.status || 'Chưa gọi') === 'Chưa gọi').length;
       const countEl = document.getElementById('tabAbandonedCount');
-      if (countEl) countEl.textContent = total;
+      if (countEl) {
+        countEl.textContent = pending;
+        if (pending === 0) {
+          countEl.style.background = '#10b981';
+        } else {
+          countEl.style.background = '#ef4444';
+        }
+      }
 
-      let pending = 0, rescued = 0, missed = 0, cancelled = 0;
-      abandonedData.forEach(o => {
-        if (o.status === 'Chưa gọi') pending++;
-        else if (o.status === 'Đã cứu' || o.status === 'Đã tự đặt đơn') rescued++;
-        else if (o.status === 'Không nghe') missed++;
-        else if (o.status === 'Hủy') cancelled++;
-      });
-
-      if (document.getElementById('count-abandoned-all')) document.getElementById('count-abandoned-all').textContent = total;
+      if (document.getElementById('count-abandoned-all')) document.getElementById('count-abandoned-all').textContent = pending;
       if (document.getElementById('count-abandoned-pending')) document.getElementById('count-abandoned-pending').textContent = pending;
-      if (document.getElementById('count-abandoned-rescued')) document.getElementById('count-abandoned-rescued').textContent = rescued;
-      if (document.getElementById('count-abandoned-missed')) document.getElementById('count-abandoned-missed').textContent = missed;
-      if (document.getElementById('count-abandoned-cancelled')) document.getElementById('count-abandoned-cancelled').textContent = cancelled;
+      if (document.getElementById('count-abandoned-rescued')) document.getElementById('count-abandoned-rescued').textContent = '0';
+      if (document.getElementById('count-abandoned-missed')) document.getElementById('count-abandoned-missed').textContent = '0';
+      if (document.getElementById('count-abandoned-cancelled')) document.getElementById('count-abandoned-cancelled').textContent = '0';
     }
 
     function renderAbandonedTable() {
@@ -2508,16 +2523,8 @@
       if (!tbody) return;
       tbody.innerHTML = '';
 
-      let list = [...abandonedData];
-
-      // Filter status
-      if (currentAbandonedFilter !== 'all') {
-        if (currentAbandonedFilter === 'Đã cứu') {
-          list = list.filter(o => o.status === 'Đã cứu' || o.status === 'Đã tự đặt đơn');
-        } else {
-          list = list.filter(o => o.status === currentAbandonedFilter);
-        }
-      }
+      // Chỉ hiển thị các đơn rớt Chưa gọi
+      let list = abandonedData.filter(o => (o.status || 'Chưa gọi') === 'Chưa gọi');
 
       // Search query
       if (searchAbandonedQuery) {
@@ -2532,7 +2539,17 @@
       }
 
       if (list.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:40px;color:var(--text-dim);">Không có đơn rớt nào phù hợp với bộ lọc.</td></tr>`;
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="7" style="text-align:center;padding:48px 20px;color:var(--text-dim);">
+              <div style="font-size:36px;margin-bottom:10px;">🎉</div>
+              <div style="font-size:16px;font-weight:700;color:#10b981;margin-bottom:6px;">Tuyệt vời! Không còn đơn rớt nào cần cứu</div>
+              <div style="font-size:13px;color:var(--text-muted);max-width:480px;margin:0 auto;line-height:1.5;">
+                Chỉ những khách hàng <b>Chưa gọi</b> mới hiển thị tại đây. Đơn khi chuyển trạng thái (Cứu thành công, Không nghe máy, Hủy) sẽ tự động hoàn tất và ra khỏi danh sách.
+              </div>
+            </td>
+          </tr>
+        `;
         return;
       }
 
@@ -2628,30 +2645,28 @@
       }
       if (!lead) return;
 
+      const leadId = (lead.order_id || '').trim();
       lead.status = newStatus;
 
       // 1. Lưu ghi đè trạng thái vào STORAGE_KEY_STATUS_OVERRIDES để không bị reset khi đồng bộ Sheets
       const statusOverrides = JSON.parse(localStorage.getItem(STORAGE_KEY_STATUS_OVERRIDES) || '{}');
-      statusOverrides[lead.order_id] = newStatus;
+      statusOverrides[leadId] = newStatus;
       localStorage.setItem(STORAGE_KEY_STATUS_OVERRIDES, JSON.stringify(statusOverrides));
 
-      // 2. Lưu vào giaythethao_abandoned_orders
-      localStorage.setItem(STORAGE_KEY_ABANDONED, JSON.stringify(abandonedData));
-
-      // 3. Nếu chuyển sang 'Đã cứu' hoặc 'Đã tự đặt đơn' và lead có thông tin hợp lệ, tự động đồng bộ vào official ordersData nếu chưa có
+      // 2. Nếu chuyển sang 'Đã cứu' hoặc 'Đã tự đặt đơn' và lead có thông tin hợp lệ, tự động đồng bộ vào official ordersData nếu chưa có
       if (newStatus === 'Đã cứu' || newStatus === 'Đã tự đặt đơn') {
-        const existingIdx = ordersData.findIndex(o => (o.order_id || '').trim() === (lead.order_id || '').trim());
+        const existingIdx = ordersData.findIndex(o => (o.order_id || '').trim() === leadId);
         if (existingIdx === -1 && isOrderCompleteInfo(lead)) {
           ordersData.push({
             ...lead,
             status: newStatus === 'Đã cứu' ? 'Thành công' : 'Đã gọi chốt',
-            note: (lead.note ? lead.note + ' | ' : '') + `Đã cứu thành công từ Đơn Rớt (${lead.order_id})`
+            note: (lead.note ? lead.note + ' | ' : '') + `Đã cứu thành công từ Đơn Rớt (${leadId})`
           });
           saveOrders();
         }
       }
 
-      // 4. Đồng bộ trạng thái lên Google Sheets qua Apps Script ngầm
+      // 3. Đồng bộ trạng thái lên Google Sheets qua Apps Script ngầm
       const config = JSON.parse(localStorage.getItem(STORAGE_KEY_CONFIG) || '{}');
       const scriptUrl = config.appsScriptUrl || DEFAULT_APPS_SCRIPT_URL;
       if (scriptUrl && scriptUrl.startsWith('http')) {
@@ -2659,18 +2674,27 @@
           method: 'POST',
           mode: 'no-cors',
           headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-          body: JSON.stringify({ action: 'updateStatus', order_id: lead.order_id, status: newStatus })
+          body: JSON.stringify({ action: 'updateStatus', order_id: leadId, status: newStatus })
         }).catch(() => {});
 
-        const updateGetUrl = scriptUrl + (scriptUrl.includes('?') ? '&' : '?') + 'action=updateStatus&order_id=' + encodeURIComponent(lead.order_id) + '&status=' + encodeURIComponent(newStatus) + '&t=' + Date.now();
+        const updateGetUrl = scriptUrl + (scriptUrl.includes('?') ? '&' : '?') + 'action=updateStatus&order_id=' + encodeURIComponent(leadId) + '&status=' + encodeURIComponent(newStatus) + '&t=' + Date.now();
         fetch(updateGetUrl, { mode: 'no-cors' }).catch(() => {});
+      }
+
+      // 4. QUAN TRỌNG: Khi chuyển trạng thái khác "Chưa gọi", đơn này BIẾN MẤT LUÔN khỏi danh sách cần cứu!
+      if (newStatus !== 'Chưa gọi') {
+        abandonedData = abandonedData.filter(o => (o.order_id || '').trim() !== leadId);
+        localStorage.setItem(STORAGE_KEY_ABANDONED, JSON.stringify(abandonedData));
+        showToast(`✓ Đã cập nhật [${newStatus}]! Đơn rớt ${leadId} đã được xử lý xong và chuyển khỏi danh sách.`);
+      } else {
+        localStorage.setItem(STORAGE_KEY_ABANDONED, JSON.stringify(abandonedData));
+        showToast(`✓ Đã cập nhật trạng thái đơn rớt: ${newStatus}`);
       }
 
       // 5. Cập nhật giao diện & KPIs
       renderAbandonedTable();
       updateAbandonedCounts();
       updateDashboardKPIs();
-      showToast(`✓ Đã cập nhật trạng thái đơn rớt: ${newStatus}`);
     }
 
     // Modal Cứu Đơn Rớt
@@ -2797,6 +2821,9 @@
       lead.full_name = fullName;
       lead.address = address;
       lead.province = province;
+
+      // Xóa ngay khỏi danh sách đơn rớt cần cứu vì đã tạo đơn chính thức thành công
+      abandonedData = abandonedData.filter(o => (o.order_id || '').trim() !== (lead.order_id || '').trim());
       saveAbandonedOrders();
 
       // Lưu statusOverrides cho cả lead và order mới để vĩnh viễn không bị reset khi đồng bộ Sheet
@@ -3005,8 +3032,8 @@
       if (todaySubEl) todaySubEl.textContent = `${todayOrderCount} đơn hợp lệ hôm nay`;
 
       // Cập nhật thẻ Đơn Rớt Cần Cứu: Chỉ báo đỏ số đơn CHƯA GỌI, đã cứu xong thì báo xanh
-      const pendingAbandonedCount = abandonedData.filter(o => o.status === 'Chưa gọi').length;
-      const rescuedAbandonedCount = abandonedData.filter(o => o.status === 'Đã cứu' || o.status === 'Đã tự đặt đơn').length;
+      const pendingAbandonedCount = abandonedData.filter(o => (o.status || 'Chưa gọi') === 'Chưa gọi').length;
+      const rescuedCount = ordersData.filter(o => (o.note && o.note.includes('Cứu')) || o.status === 'Đã cứu' || (o.order_id && o.order_id.startsWith('ROT-'))).length;
 
       const kpiAbandoned = document.getElementById('kpiAbandonedOrders');
       const kpiAbandonedSub = document.getElementById('kpiAbandonedSub');
@@ -3017,7 +3044,11 @@
         if (pendingAbandonedCount === 0) {
           kpiAbandoned.style.color = '#10b981';
           if (kpiAbandonedCard) kpiAbandonedCard.style.borderLeftColor = '#10b981';
-          if (kpiAbandonedSub) kpiAbandonedSub.innerHTML = `✓ Đã xử lý &amp; cứu xong <b>${rescuedAbandonedCount}</b> đơn rớt`;
+          if (kpiAbandonedSub) {
+            kpiAbandonedSub.innerHTML = rescuedCount > 0 
+              ? `✓ Đã cứu thành công <b>${rescuedCount}</b> đơn rớt`
+              : `✓ Toàn bộ đơn rớt đã được xử lý xong`;
+          }
         } else {
           kpiAbandoned.style.color = '#ef4444';
           if (kpiAbandonedCard) kpiAbandonedCard.style.borderLeftColor = '#ef4444';
@@ -3219,7 +3250,11 @@
               if (isRescued && isOrderCompleteInfo(item)) {
                 officialList.push(item);
               }
-              rotList.push(item);
+              // CHỈ đưa vào rotList (Đơn rớt cần cứu) những lead CÒN ở trạng thái 'Chưa gọi'
+              // Khi đã đổi trạng thái (Đã cứu, Không nghe máy, Hủy, Đã tự đặt đơn) là mất khỏi mục cứu đơn!
+              if (st === 'Chưa gọi') {
+                rotList.push(item);
+              }
             } else {
               officialList.push(item);
             }
@@ -3230,19 +3265,17 @@
             officialList.map(o => (o.phone_number || '').replace(/[^0-9]/g, '')).filter(p => p.length >= 9)
           );
 
-          rotList.forEach(lead => {
+          // Loại bỏ những lead mà khách đã tự đặt đơn chính thức hoặc không còn là 'Chưa gọi'
+          const pendingRotList = rotList.filter(lead => {
             const p = (lead.phone_number || '').replace(/[^0-9]/g, '');
-            if (p && officialPhones.has(p) && lead.status === 'Chưa gọi') {
-              const matched = officialList.find(o => (o.phone_number || '').replace(/[^0-9]/g, '') === p);
-              lead.status = 'Đã tự đặt đơn';
-              if (matched) {
-                lead.note = (lead.note ? lead.note + ' | ' : '') + `Khách đã hoàn tất đơn (${matched.order_id})`;
-              }
+            if (p && officialPhones.has(p)) {
+              return false;
             }
+            return (lead.status || 'Chưa gọi') === 'Chưa gọi';
           });
 
           ordersData = officialList;
-          abandonedData = rotList;
+          abandonedData = pendingRotList;
 
           saveOrders();
           saveAbandonedOrders();
