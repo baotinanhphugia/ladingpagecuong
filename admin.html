@@ -1915,7 +1915,7 @@
       const pCount = ordersData.filter(o => o.status === 'Chờ xác nhận').length;
       const cCount = ordersData.filter(o => o.status === 'Đã gọi chốt').length;
       const sCount = ordersData.filter(o => o.status === 'Đang giao').length;
-      const okCount = ordersData.filter(o => o.status === 'Thành công').length;
+      const okCount = ordersData.filter(o => o.status === 'Thành công' || o.status === 'Đã cứu').length;
       const xCount = ordersData.filter(o => o.status === 'Đã hủy').length;
 
       document.getElementById('count-pending').textContent = pCount;
@@ -2055,7 +2055,11 @@
 
       // Filter status
       if (currentFilter !== 'all') {
-        list = list.filter(o => o.status === currentFilter);
+        if (currentFilter === 'Thành công') {
+          list = list.filter(o => o.status === 'Thành công' || o.status === 'Đã cứu');
+        } else {
+          list = list.filter(o => o.status === currentFilter);
+        }
       }
 
       // Search query
@@ -2462,6 +2466,13 @@
       } else {
         abandonedData = [];
       }
+      // Áp dụng trạng thái ghi đè (statusOverrides) để không bao giờ bị mất trạng thái admin đã bấm
+      const statusOverrides = JSON.parse(localStorage.getItem(STORAGE_KEY_STATUS_OVERRIDES) || '{}');
+      abandonedData.forEach(lead => {
+        if (lead.order_id && statusOverrides[lead.order_id]) {
+          lead.status = statusOverrides[lead.order_id];
+        }
+      });
       localStorage.setItem(STORAGE_KEY_ABANDONED, JSON.stringify(abandonedData));
     }
 
@@ -2501,7 +2512,11 @@
 
       // Filter status
       if (currentAbandonedFilter !== 'all') {
-        list = list.filter(o => o.status === currentAbandonedFilter);
+        if (currentAbandonedFilter === 'Đã cứu') {
+          list = list.filter(o => o.status === 'Đã cứu' || o.status === 'Đã tự đặt đơn');
+        } else {
+          list = list.filter(o => o.status === currentAbandonedFilter);
+        }
       }
 
       // Search query
@@ -2534,7 +2549,7 @@
           actionBtnHtml = `<span style="font-size:11.5px;color:#22c55e;font-weight:700;">✓ Đã cứu thành công</span>`;
         } else {
           actionBtnHtml = `
-            <button onclick="openRescueLeadModal(${realIndex})" class="btn-action" style="padding:5px 10px;font-size:12px;white-space:nowrap;background:linear-gradient(135deg,#22c55e,#16a34a);border-color:#16a34a;color:#fff;font-weight:700;display:flex;align-items:center;gap:4px;" title="Gọi khách & cứu đơn">
+            <button onclick="openRescueLeadModal('${lead.order_id}')" class="btn-action" style="padding:5px 10px;font-size:12px;white-space:nowrap;background:linear-gradient(135deg,#22c55e,#16a34a);border-color:#16a34a;color:#fff;font-weight:700;display:flex;align-items:center;gap:4px;" title="Gọi khách & cứu đơn">
               <span style="font-size:13px;">📞</span> Cứu Đơn
             </button>
           `;
@@ -2574,7 +2589,7 @@
             <div class="price-amount" style="color:#FFC400;">${lead.total_amount || lead.price || '329.000đ'}</div>
           </td>
           <td>
-            <select class="setting-input" style="padding:4px 8px;font-size:12px;width:auto;" onchange="changeAbandonedStatus(${realIndex}, this.value)">
+            <select class="setting-input" style="padding:4px 8px;font-size:12px;width:auto;" onchange="changeAbandonedStatus('${lead.order_id}', this.value, this)">
               <option value="Chưa gọi" ${lead.status === 'Chưa gọi' ? 'selected' : ''}>🔴 Chưa gọi</option>
               <option value="Đã cứu" ${lead.status === 'Đã cứu' ? 'selected' : ''}>🟢 Đã cứu thành công</option>
               <option value="Không nghe" ${lead.status === 'Không nghe' ? 'selected' : ''}>🟡 Không nghe máy</option>
@@ -2604,27 +2619,94 @@
       renderAbandonedTable();
     }
 
-    function changeAbandonedStatus(index, newStatus) {
-      if (abandonedData[index]) {
-        abandonedData[index].status = newStatus;
-        saveAbandonedOrders();
-        showToast(`✓ Đã cập nhật trạng thái đơn rớt: ${newStatus}`);
+    function changeAbandonedStatus(orderIdOrIndex, newStatus, selectEl) {
+      let lead = null;
+      if (typeof orderIdOrIndex === 'number') {
+        lead = abandonedData[orderIdOrIndex];
+      } else {
+        lead = abandonedData.find(o => (o.order_id || '').trim() === (orderIdOrIndex || '').trim());
       }
+      if (!lead) return;
+
+      lead.status = newStatus;
+
+      // 1. Lưu ghi đè trạng thái vào STORAGE_KEY_STATUS_OVERRIDES để không bị reset khi đồng bộ Sheets
+      const statusOverrides = JSON.parse(localStorage.getItem(STORAGE_KEY_STATUS_OVERRIDES) || '{}');
+      statusOverrides[lead.order_id] = newStatus;
+      localStorage.setItem(STORAGE_KEY_STATUS_OVERRIDES, JSON.stringify(statusOverrides));
+
+      // 2. Lưu vào giaythethao_abandoned_orders
+      localStorage.setItem(STORAGE_KEY_ABANDONED, JSON.stringify(abandonedData));
+
+      // 3. Nếu chuyển sang 'Đã cứu' hoặc 'Đã tự đặt đơn' và lead có thông tin hợp lệ, tự động đồng bộ vào official ordersData nếu chưa có
+      if (newStatus === 'Đã cứu' || newStatus === 'Đã tự đặt đơn') {
+        const existingIdx = ordersData.findIndex(o => (o.order_id || '').trim() === (lead.order_id || '').trim());
+        if (existingIdx === -1 && isOrderCompleteInfo(lead)) {
+          ordersData.push({
+            ...lead,
+            status: newStatus === 'Đã cứu' ? 'Thành công' : 'Đã gọi chốt',
+            note: (lead.note ? lead.note + ' | ' : '') + `Đã cứu thành công từ Đơn Rớt (${lead.order_id})`
+          });
+          saveOrders();
+        }
+      }
+
+      // 4. Đồng bộ trạng thái lên Google Sheets qua Apps Script ngầm
+      const config = JSON.parse(localStorage.getItem(STORAGE_KEY_CONFIG) || '{}');
+      const scriptUrl = config.appsScriptUrl || DEFAULT_APPS_SCRIPT_URL;
+      if (scriptUrl && scriptUrl.startsWith('http')) {
+        fetch(scriptUrl, {
+          method: 'POST',
+          mode: 'no-cors',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify({ action: 'updateStatus', order_id: lead.order_id, status: newStatus })
+        }).catch(() => {});
+
+        const updateGetUrl = scriptUrl + (scriptUrl.includes('?') ? '&' : '?') + 'action=updateStatus&order_id=' + encodeURIComponent(lead.order_id) + '&status=' + encodeURIComponent(newStatus) + '&t=' + Date.now();
+        fetch(updateGetUrl, { mode: 'no-cors' }).catch(() => {});
+      }
+
+      // 5. Cập nhật giao diện & KPIs
+      renderAbandonedTable();
+      updateAbandonedCounts();
+      updateDashboardKPIs();
+      showToast(`✓ Đã cập nhật trạng thái đơn rớt: ${newStatus}`);
     }
 
     // Modal Cứu Đơn Rớt
-    function openRescueLeadModal(index) {
-      const lead = abandonedData[index];
+    function openRescueLeadModal(indexOrId) {
+      let lead = null;
+      let realIndex = -1;
+      if (typeof indexOrId === 'number') {
+        lead = abandonedData[indexOrId];
+        realIndex = indexOrId;
+      } else {
+        realIndex = abandonedData.findIndex(o => (o.order_id || '').trim() === (indexOrId || '').trim());
+        lead = abandonedData[realIndex];
+      }
       if (!lead) return;
 
-      document.getElementById('rescueLeadIndex').value = index;
+      document.getElementById('rescueLeadIndex').value = realIndex;
       document.getElementById('rescueModalLeadId').textContent = lead.order_id || 'Đơn rớt';
       document.getElementById('rescueFullName').value = (lead.full_name && !lead.full_name.includes('chưa') && !lead.full_name.includes('Khách hàng')) ? lead.full_name : '';
       document.getElementById('rescuePhone').value = lead.phone_number || '';
       document.getElementById('rescueProvince').value = lead.province || '';
       document.getElementById('rescueDistrict').value = lead.district || '';
       document.getElementById('rescueAddress').value = lead.address || '';
-      document.getElementById('rescueProduct').value = lead.product || 'Giày Safety Cổ Thấp';
+      
+      const pVal = (lead.product || '').toLowerCase();
+      const prodSelect = document.getElementById('rescueProduct');
+      let matched = false;
+      for (let i = 0; i < prodSelect.options.length; i++) {
+        const optVal = prodSelect.options[i].value.toLowerCase();
+        if (optVal === pVal || (pVal.includes('cổ cao') && optVal.includes('cổ cao')) || (pVal.includes('cổ thấp') && optVal.includes('cổ thấp')) || (pVal.includes('hammer') && optVal.includes('hammer'))) {
+          prodSelect.selectedIndex = i;
+          matched = true;
+          break;
+        }
+      }
+      if (!matched) prodSelect.selectedIndex = 1;
+
       document.getElementById('rescueSize').value = lead.size || '40';
       document.getElementById('rescueQuantity').value = lead.quantity || 1;
       document.getElementById('rescueTotalAmount').value = lead.total_amount || lead.price || '329.000đ';
@@ -2704,7 +2786,7 @@
         quantity: quantity,
         price: product.includes('Cổ Cao') ? '399.000đ' : '329.000đ',
         total_amount: totalAmount,
-        status: 'Đã gọi chốt',
+        status: 'Thành công',
         note: `🎉 Cứu đơn thành công từ Đơn Rớt (${lead.order_id || ''})${note ? ' | ' + note : ''}`
       };
 
@@ -2717,7 +2799,13 @@
       lead.province = province;
       saveAbandonedOrders();
 
-      // Đẩy đơn mới lên Google Sheet để đồng bộ tức thì
+      // Lưu statusOverrides cho cả lead và order mới để vĩnh viễn không bị reset khi đồng bộ Sheet
+      const statusOverrides = JSON.parse(localStorage.getItem(STORAGE_KEY_STATUS_OVERRIDES) || '{}');
+      if (lead.order_id) statusOverrides[lead.order_id] = 'Đã cứu';
+      statusOverrides[officialOrderId] = 'Thành công';
+      localStorage.setItem(STORAGE_KEY_STATUS_OVERRIDES, JSON.stringify(statusOverrides));
+
+      // Đẩy đơn mới lên Google Sheet và update trạng thái đơn rớt
       const config = JSON.parse(localStorage.getItem(STORAGE_KEY_CONFIG) || '{}');
       const scriptUrl = config.appsScriptUrl || DEFAULT_APPS_SCRIPT_URL;
       if (scriptUrl && scriptUrl.startsWith('http')) {
@@ -2727,11 +2815,25 @@
           headers: { 'Content-Type': 'text/plain;charset=utf-8' },
           body: JSON.stringify(newOrder)
         }).catch(() => {});
+
+        if (lead.order_id) {
+          fetch(scriptUrl, {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+            body: JSON.stringify({ action: 'updateStatus', order_id: lead.order_id, status: 'Đã cứu' })
+          }).catch(() => {});
+
+          const updateGetUrl = scriptUrl + (scriptUrl.includes('?') ? '&' : '?') + 'action=updateStatus&order_id=' + encodeURIComponent(lead.order_id) + '&status=' + encodeURIComponent('Đã cứu') + '&t=' + Date.now();
+          fetch(updateGetUrl, { mode: 'no-cors' }).catch(() => {});
+        }
       }
 
       closeRescueModal();
-      showToast(`🎉 Tuyệt vời! Đã cứu thành công đơn cho khách ${fullName} (${officialOrderId}) và cộng ${totalAmount} vào doanh số thực tế!`);
-      switchTab('orders');
+      showToast(`🎉 Tuyệt vời! Đã cứu thành công đơn cho khách ${fullName} (${officialOrderId}) và thêm vào Quản lý đơn hàng!`);
+      renderAbandonedTable();
+      updateAbandonedCounts();
+      updateDashboardKPIs();
     }
 
     function convertAbandonedToOrder(index) {
@@ -3043,7 +3145,12 @@
               if (!cur.province && item.province) cur.province = item.province;
               if (!cur.district && item.district) cur.district = item.district;
               if ((!cur.phone_number || cur.phone_number.length < 9) && item.phone_number) cur.phone_number = item.phone_number;
-              if (item.status && item.status !== 'Chờ xác nhận') cur.status = item.status;
+              const highPriorityStatuses = ['Đã cứu', 'Đã tự đặt đơn', 'Thành công', 'Đang giao', 'Đã gọi chốt'];
+              if (highPriorityStatuses.includes(item.status)) {
+                cur.status = item.status;
+              } else if (!highPriorityStatuses.includes(cur.status) && item.status && item.status !== 'Chờ xác nhận') {
+                cur.status = item.status;
+              }
             }
           });
 
