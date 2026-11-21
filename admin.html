@@ -2909,7 +2909,7 @@
           year: slotDate.getFullYear(),
           month: slotDate.getMonth(),
           date: slotDate.getDate(),
-          label: `${dd}-${mm}`,
+          label: `${dd}/${mm}`,
           revenue: 0,
           ordersCount: 0
         });
@@ -2917,8 +2917,13 @@
 
       // Đếm trạng thái đơn hàng trên toàn bộ ordersData
       ordersData.forEach(o => {
-        if (statusCounts[o.status] !== undefined) {
-          statusCounts[o.status]++;
+        let st = (o.status || 'Chờ xác nhận').trim();
+        if (st === 'Đã cứu') st = 'Thành công';
+        if (st === 'Hủy') st = 'Đã hủy';
+        if (statusCounts[st] !== undefined) {
+          statusCounts[st]++;
+        } else {
+          statusCounts['Chờ xác nhận']++;
         }
       });
 
@@ -2936,14 +2941,30 @@
         const num = parseInt((o.total_amount || o.price || '0').replace(/[^0-9]/g, '')) || 0;
         totalRev += num;
 
-        if (o.status === 'Thành công' || o.status === 'Đã gọi chốt') {
+        if (['Thành công', 'Đã gọi chốt', 'Đang giao', 'Đã cứu'].includes(o.status)) {
           successCount++;
         }
 
-        // Product count
-        if (o.product && o.product.includes('Cổ Cao')) prodCounts['Giày Safety Cổ Cao']++;
-        else if (o.product && o.product.includes('Hammer')) prodCounts['Giày Thể Thao Hammer']++;
-        else prodCounts['Giày Safety Cổ Thấp']++;
+        // Product count by PAIRS (quantity), not just order count!
+        const qty = parseInt(o.quantity) || 1;
+        const prodName = (o.product || '').toLowerCase();
+
+        if (prodName.includes('cổ cao') || prodName.includes('co cao') || prodName.includes('cao cổ')) {
+          prodCounts['Giày Safety Cổ Cao'] += qty;
+        } else if (prodName.includes('hammer')) {
+          prodCounts['Giày Thể Thao Hammer'] += qty;
+        } else if (prodName.includes('cổ thấp') || prodName.includes('co thap') || prodName.includes('thấp cổ')) {
+          prodCounts['Giày Safety Cổ Thấp'] += qty;
+        } else {
+          // Phân loại dự phòng theo đơn giá nếu tên chung chung (ví dụ "Giày Bảo Hộ")
+          const priceNum = parseInt((o.price || o.total_amount || '0').replace(/[^0-9]/g, '')) || 0;
+          const unitPrice = qty > 0 ? (priceNum / qty) : priceNum;
+          if (unitPrice >= 380000) {
+            prodCounts['Giày Safety Cổ Cao'] += qty;
+          } else {
+            prodCounts['Giày Safety Cổ Thấp'] += qty;
+          }
+        }
 
         // Khớp thời gian đơn hàng vào Doanh thu hôm nay & Biểu đồ 7 ngày
         const oDate = parseOrderDate(o);
@@ -2967,11 +2988,13 @@
         }
       });
 
+      const totalProds = Object.values(prodCounts).reduce((a, b) => a + b, 0);
+
       // Update Top KPIs
       document.getElementById('kpiTotalRevenue').textContent = totalRev.toLocaleString('vi-VN') + 'đ';
       document.getElementById('kpiTotalOrders').textContent = validOrders.length;
       const subOrdersEl = document.getElementById('kpiTotalOrdersSub');
-      if (subOrdersEl) subOrdersEl.textContent = `${validOrders.length} đơn đủ điều kiện (${ordersData.length} tổng tiếp nhận)`;
+      if (subOrdersEl) subOrdersEl.textContent = `${validOrders.length} đơn (${totalProds} đôi) đủ điều kiện (${ordersData.length} tổng tiếp nhận)`;
 
       document.getElementById('kpiSuccessOrders').textContent = successCount;
       const rate = validOrders.length > 0 ? Math.round((successCount / validOrders.length) * 100) : 0;
@@ -2981,8 +3004,26 @@
       const todaySubEl = document.getElementById('kpiTodayOrders');
       if (todaySubEl) todaySubEl.textContent = `${todayOrderCount} đơn hợp lệ hôm nay`;
 
+      // Cập nhật thẻ Đơn Rớt Cần Cứu: Chỉ báo đỏ số đơn CHƯA GỌI, đã cứu xong thì báo xanh
+      const pendingAbandonedCount = abandonedData.filter(o => o.status === 'Chưa gọi').length;
+      const rescuedAbandonedCount = abandonedData.filter(o => o.status === 'Đã cứu' || o.status === 'Đã tự đặt đơn').length;
+
       const kpiAbandoned = document.getElementById('kpiAbandonedOrders');
-      if (kpiAbandoned) kpiAbandoned.textContent = abandonedData.length;
+      const kpiAbandonedSub = document.getElementById('kpiAbandonedSub');
+      const kpiAbandonedCard = document.querySelector('.stat-card.abandoned');
+
+      if (kpiAbandoned) {
+        kpiAbandoned.textContent = pendingAbandonedCount;
+        if (pendingAbandonedCount === 0) {
+          kpiAbandoned.style.color = '#10b981';
+          if (kpiAbandonedCard) kpiAbandonedCard.style.borderLeftColor = '#10b981';
+          if (kpiAbandonedSub) kpiAbandonedSub.innerHTML = `✓ Đã xử lý &amp; cứu xong <b>${rescuedAbandonedCount}</b> đơn rớt`;
+        } else {
+          kpiAbandoned.style.color = '#ef4444';
+          if (kpiAbandonedCard) kpiAbandonedCard.style.borderLeftColor = '#ef4444';
+          if (kpiAbandonedSub) kpiAbandonedSub.innerHTML = `⚠️ Có <b>${pendingAbandonedCount}</b> khách cần gọi chốt ngay`;
+        }
+      }
 
       // Render 7-day bar chart
       const chartEl = document.getElementById('revenueBarChart');
@@ -3011,17 +3052,16 @@
       // Render product breakdown
       const prodListEl = document.getElementById('productBreakdownList');
       prodListEl.innerHTML = '';
-      const totalProds = Object.values(prodCounts).reduce((a,b)=>a+b, 0) || 1;
 
       for (const prod in prodCounts) {
         const count = prodCounts[prod];
-        const pct = Math.round((count / totalProds) * 100);
+        const pct = totalProds > 0 ? Math.round((count / totalProds) * 100) : 0;
         const item = document.createElement('div');
         item.className = 'breakdown-item';
         item.innerHTML = `
           <div class="breakdown-header">
             <span class="breakdown-name">${prod}</span>
-            <span class="breakdown-count">${count} đôi (${pct}%)</span>
+            <span class="breakdown-count" style="${count > 0 ? 'color:var(--gold-primary);font-weight:700;' : ''}">${count} đôi (${pct}%)</span>
           </div>
           <div class="progress-bar-bg">
             <div class="progress-bar-fill" style="width: ${pct}%;"></div>
@@ -3145,6 +3185,9 @@
               if (!cur.province && item.province) cur.province = item.province;
               if (!cur.district && item.district) cur.district = item.district;
               if ((!cur.phone_number || cur.phone_number.length < 9) && item.phone_number) cur.phone_number = item.phone_number;
+              if ((!cur.product || cur.product === 'Giày Bảo Hộ') && item.product && item.product !== 'Giày Bảo Hộ') cur.product = item.product;
+              if ((!cur.quantity || cur.quantity == 1) && item.quantity && item.quantity > 1) cur.quantity = item.quantity;
+              if ((!cur.total_amount || cur.total_amount === '0đ') && item.total_amount) cur.total_amount = item.total_amount;
               const highPriorityStatuses = ['Đã cứu', 'Đã tự đặt đơn', 'Thành công', 'Đang giao', 'Đã gọi chốt'];
               if (highPriorityStatuses.includes(item.status)) {
                 cur.status = item.status;
